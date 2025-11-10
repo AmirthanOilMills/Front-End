@@ -1,15 +1,9 @@
 import React from 'react';
 import { ShoppingCart, Heart, Eye } from 'lucide-react';
-import { Product } from '../types';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 
-interface ProductCardProps {
-  product: Product;
-  onViewDetails: (product: Product) => void;
-}
-
-const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails }) => {
+const ProductCard = ({ product, onViewDetails }) => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 

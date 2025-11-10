@@ -1,25 +1,13 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { useNavigate } from 'react-router-dom';
 
-interface CheckoutPageProps {
-  onPageChange: (page: string) => void;
-}
+const CheckoutPage = () => {
+  const navigate = useNavigate();
 
-interface FormData {
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  pincode: string;
-  paymentMethod: string;
-}
-
-const CheckoutPage: React.FC<CheckoutPageProps> = ({ onPageChange }) => {
   const { cart, clearCart } = useCart();
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
@@ -35,21 +23,19 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onPageChange }) => {
   const shippingCost = cart.total >= 500 ? 0 : 50;
   const finalTotal = cart.total + shippingCost;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // In a real app, this would send the order to your backend
     console.log('Order submitted:', { formData, cart, total: finalTotal });
 
     setOrderPlaced(true);
@@ -68,13 +54,13 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onPageChange }) => {
           </p>
           <div className="space-y-3">
             <button
-              onClick={() => onPageChange('home')}
+              onClick={() => navigate('/')}
               className="w-full bg-green-800 hover:bg-green-900 text-white font-semibold py-3 rounded-lg transition-colors"
             >
               Continue Shopping
             </button>
             <button
-              onClick={() => onPageChange('products')}
+              onClick={() => navigate('/products')}
               className="w-full border border-green-800 text-green-800 hover:bg-green-50 font-semibold py-3 rounded-lg transition-colors"
             >
               View Products
@@ -90,7 +76,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onPageChange }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <button
-          onClick={() => onPageChange('cart')}
+          onClick={() => navigate('/cart')}
           className="flex items-center text-green-800 hover:text-green-900 mb-6"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
@@ -162,7 +148,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onPageChange }) => {
                     <textarea
                       name="address"
                       required
-                      rows={3}
+                      rows="3"
                       value={formData.address}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -270,8 +256,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onPageChange }) => {
           {/* Order Summary */}
           <div className="bg-white rounded-lg shadow-md p-6 h-fit sticky top-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
-            
-            {/* Items */}
+
             <div className="space-y-4 mb-6">
               {cart.items.map((item) => (
                 <div key={item.id} className="flex items-center space-x-3">
@@ -284,9 +269,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onPageChange }) => {
                     <p className="text-sm font-medium text-gray-900 truncate">
                       {item.product.name}
                     </p>
-                    <p className="text-sm text-gray-500">
-                      Qty: {item.quantity}
-                    </p>
+                    <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                   </div>
                   <p className="text-sm font-medium text-gray-900">
                     ₹{(item.product.price * item.quantity).toFixed(2)}
@@ -295,7 +278,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ onPageChange }) => {
               ))}
             </div>
 
-            {/* Totals */}
             <div className="space-y-3 border-t border-gray-200 pt-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>

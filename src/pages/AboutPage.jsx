@@ -1,7 +1,7 @@
 import React from 'react';
 import { Leaf, Award, Users, Heart, Target, Eye } from 'lucide-react';
 
-const AboutPage: React.FC = () => {
+const AboutPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}

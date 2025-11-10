@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { login } from '../../api/auth';
 
-interface AdminLoginPageProps {
-  onPageChange: (page: string) => void;
-}
-
-const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onPageChange }) => {
+const AdminLoginPage = ({ onPageChange }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -15,9 +12,9 @@ const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onPageChange }) => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { login } = useAuth();
+  // const { login } = useAuth();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -25,12 +22,12 @@ const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onPageChange }) => {
     setError('');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
 
-    const success = await login(formData.email, formData.password);
+    const success = await login(formData);
     
     if (success) {
       onPageChange('admin-dashboard');

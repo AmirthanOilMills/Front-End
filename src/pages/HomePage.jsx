@@ -2,17 +2,15 @@ import React from 'react';
 import { ArrowRight, Leaf, Award, Truck, Users, Star } from 'lucide-react';
 import { mockProducts, mockTestimonials } from '../data/mockData';
 import ProductCard from '../components/ProductCard';
-import { Product } from '../types';
+import { useNavigate } from 'react-router-dom';
 
-interface HomePageProps {
-  onPageChange: (page: string, data?: any) => void;
-}
+const HomePage = () => {
+  const navigate = useNavigate();
 
-const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
   const featuredProducts = mockProducts.slice(0, 4);
 
-  const handleViewProduct = (product: Product) => {
-    onPageChange('product-detail', product);
+  const handleViewProduct = (product) => {
+    navigate('/product', { state: { product } });
   };
 
   return (
@@ -29,11 +27,11 @@ const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 Pure Quality Oils for Every Home & Kitchen
               </p>
               <p className="text-lg mb-8 text-green-200">
-                Experience the authentic taste and natural goodness of traditional cold-pressed oils, 
+                Experience the authentic taste and natural goodness of traditional cold-pressed oils,
                 made using time-tested methods for your health and well-being.
               </p>
               <button
-                onClick={() => onPageChange('products')}
+                onClick={() => navigate('/products')}
                 className="bg-yellow-500 hover:bg-yellow-600 text-green-900 font-bold py-4 px-8 rounded-lg text-lg transition-colors flex items-center space-x-2"
               >
                 <span>Shop Now</span>
@@ -94,20 +92,16 @@ const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Products</h2>
             <p className="text-lg text-gray-600">Discover our most popular and premium quality oils</p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onViewDetails={handleViewProduct}
-              />
+              <ProductCard key={product.id} product={product} onViewDetails={handleViewProduct} />
             ))}
           </div>
-          
+
           <div className="text-center mt-12">
             <button
-              onClick={() => onPageChange('products')}
+              onClick={() => navigate('/products')}
               className="bg-green-800 hover:bg-green-900 text-white font-semibold py-3 px-8 rounded-lg transition-colors"
             >
               View All Products
@@ -129,7 +123,10 @@ const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold mb-2">Cold-Pressed Excellence</h3>
-                    <p className="text-gray-600">Our oils are extracted using traditional cold-press methods that preserve all the natural nutrients and authentic flavors.</p>
+                    <p className="text-gray-600">
+                      Our oils are extracted using traditional cold-press methods that preserve all the
+                      natural nutrients and authentic flavors.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -138,7 +135,10 @@ const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold mb-2">Purity Guaranteed</h3>
-                    <p className="text-gray-600">No chemicals, no additives, no preservatives - just pure, natural oils as nature intended.</p>
+                    <p className="text-gray-600">
+                      No chemicals, no additives, no preservatives - just pure, natural oils as nature
+                      intended.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -147,7 +147,10 @@ const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold mb-2">Traditional Methods</h3>
-                    <p className="text-gray-600">We follow age-old techniques passed down through generations, ensuring authentic taste and quality.</p>
+                    <p className="text-gray-600">
+                      We follow age-old techniques passed down through generations, ensuring authentic
+                      taste and quality.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -170,7 +173,7 @@ const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Health Benefits of Our Oils</h2>
             <p className="text-lg text-gray-600">Natural goodness for your health and wellness</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="bg-green-100 p-3 rounded-full inline-block mb-4">
@@ -184,7 +187,7 @@ const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 <li>• Antimicrobial properties</li>
               </ul>
             </div>
-            
+
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="bg-yellow-100 p-3 rounded-full inline-block mb-4">
                 <Award className="w-6 h-6 text-yellow-600" />
@@ -197,7 +200,7 @@ const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
                 <li>• Anti-inflammatory properties</li>
               </ul>
             </div>
-            
+
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="bg-blue-100 p-3 rounded-full inline-block mb-4">
                 <Users className="w-6 h-6 text-blue-600" />
@@ -221,7 +224,7 @@ const HomePage: React.FC<HomePageProps> = ({ onPageChange }) => {
             <h2 className="text-3xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
             <p className="text-lg text-gray-600">Real reviews from satisfied customers</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {mockTestimonials.map((testimonial) => (
               <div key={testimonial.id} className="bg-white p-6 rounded-lg shadow-md">

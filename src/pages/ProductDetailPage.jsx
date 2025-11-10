@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ShoppingCart, Heart, Minus, Plus, Star, Leaf } from 'lucide-react';
-import { Product } from '../types';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { mockProducts } from '../data/mockData';
 import ProductCard from '../components/ProductCard';
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-interface ProductDetailPageProps {
-  product: Product;
-  onPageChange: (page: string, data?: any) => void;
-}
+const ProductDetailPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, onPageChange }) => {
+  const { product } = location.state || {};
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -32,8 +32,8 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, onPageCh
     }
   };
 
-  const handleViewProduct = (selectedProduct: Product) => {
-    onPageChange('product-detail', selectedProduct);
+  const handleViewProduct = (selectedProduct) => {
+    navigate('/product', { state: { selectedProduct } });
   };
 
   return (
@@ -41,7 +41,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, onPageCh
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <button
-          onClick={() => onPageChange('products')}
+          onClick={() => navigate('/products')}
           className="flex items-center text-green-800 hover:text-green-900 mb-6"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
@@ -69,7 +69,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, onPageCh
               </div>
 
               <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
-              
+
               <div className="flex items-center mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
@@ -112,11 +112,10 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, onPageCh
                 <button
                   onClick={handleAddToCart}
                   disabled={!product.inStock}
-                  className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2 ${
-                    product.inStock
+                  className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2 ${product.inStock
                       ? 'bg-green-800 hover:bg-green-900 text-white'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
+                    }`}
                 >
                   <ShoppingCart className="w-5 h-5" />
                   <span>{product.inStock ? 'Add to Cart' : 'Out of Stock'}</span>
@@ -124,11 +123,10 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, onPageCh
 
                 <button
                   onClick={handleWishlistClick}
-                  className={`px-6 py-3 rounded-lg border-2 transition-colors flex items-center justify-center ${
-                    isInWishlist(product.id)
+                  className={`px-6 py-3 rounded-lg border-2 transition-colors flex items-center justify-center ${isInWishlist(product.id)
                       ? 'border-red-300 bg-red-50 text-red-600'
                       : 'border-gray-300 hover:border-gray-400 text-gray-600'
-                  }`}
+                    }`}
                 >
                   <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
                 </button>

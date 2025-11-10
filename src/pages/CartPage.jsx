@@ -1,12 +1,9 @@
 import React from 'react';
 import { Minus, Plus, X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-
-interface CartPageProps {
-  onPageChange: (page: string) => void;
-}
-
-const CartPage: React.FC<CartPageProps> = ({ onPageChange }) => {
+import { useNavigate } from 'react-router-dom';
+const CartPage = () => {
+  const navigate = useNavigate();
   const { cart, updateQuantity, removeFromCart } = useCart();
 
   if (cart.items.length === 0) {
@@ -17,7 +14,7 @@ const CartPage: React.FC<CartPageProps> = ({ onPageChange }) => {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
           <p className="text-gray-600 mb-8">Start shopping to add items to your cart</p>
           <button
-            onClick={() => onPageChange('products')}
+            onClick={() => navigate('/products')}
             className="bg-green-800 hover:bg-green-900 text-white font-semibold py-3 px-8 rounded-lg transition-colors"
           >
             Continue Shopping
@@ -32,7 +29,9 @@ const CartPage: React.FC<CartPageProps> = ({ onPageChange }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Shopping Cart</h1>
-          <p className="text-gray-600">{cart.items.length} item{cart.items.length !== 1 ? 's' : ''} in your cart</p>
+          <p className="text-gray-600">
+            {cart.items.length} item{cart.items.length !== 1 ? 's' : ''} in your cart
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -42,20 +41,21 @@ const CartPage: React.FC<CartPageProps> = ({ onPageChange }) => {
               <div className="p-6">
                 <div className="space-y-6">
                   {cart.items.map((item) => (
-                    <div key={item.id} className="flex items-center space-x-4 border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
+                    <div
+                      key={item.id}
+                      className="flex items-center space-x-4 border-b border-gray-200 pb-6 last:border-b-0 last:pb-0"
+                    >
                       <img
                         src={item.product.image}
                         alt={item.product.name}
                         className="w-20 h-20 object-cover rounded-lg"
                       />
-                      
+
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-gray-900 truncate">
                           {item.product.name}
                         </h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {item.product.category}
-                        </p>
+                        <p className="text-sm text-gray-500 mt-1">{item.product.category}</p>
                         <p className="text-lg font-bold text-green-800 mt-2">
                           ₹{item.product.price}
                         </p>
@@ -105,7 +105,7 @@ const CartPage: React.FC<CartPageProps> = ({ onPageChange }) => {
             {/* Continue Shopping */}
             <div className="mt-6">
               <button
-                onClick={() => onPageChange('products')}
+                onClick={() => navigate('/products')}
                 className="text-green-800 hover:text-green-900 font-medium flex items-center"
               >
                 Continue Shopping
@@ -117,28 +117,28 @@ const CartPage: React.FC<CartPageProps> = ({ onPageChange }) => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-8">
               <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
-              
+
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
                   <span className="text-gray-900">₹{cart.total.toFixed(2)}</span>
                 </div>
-                
+
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping</span>
                   <span className="text-gray-900">
                     {cart.total >= 500 ? 'Free' : '₹50.00'}
                   </span>
                 </div>
-                
+
                 {cart.total < 500 && (
                   <div className="text-sm text-green-600 bg-green-50 p-3 rounded-md">
                     Add ₹{(500 - cart.total).toFixed(2)} more to get free shipping!
                   </div>
                 )}
-                
+
                 <hr />
-                
+
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
                   <span className="text-green-800">
@@ -148,7 +148,7 @@ const CartPage: React.FC<CartPageProps> = ({ onPageChange }) => {
               </div>
 
               <button
-                onClick={() => onPageChange('checkout')}
+                onClick={() => navigate('/checkout')}
                 className="w-full bg-green-800 hover:bg-green-900 text-white font-semibold py-3 px-4 rounded-lg transition-colors mt-6 flex items-center justify-center space-x-2"
               >
                 <span>Proceed to Checkout</span>

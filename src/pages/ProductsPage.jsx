@@ -2,28 +2,28 @@ import React, { useState } from 'react';
 import { Search, Filter } from 'lucide-react';
 import { mockProducts } from '../data/mockData';
 import ProductCard from '../components/ProductCard';
-import { Product } from '../types';
+import { useNavigate } from 'react-router-dom';
 
-interface ProductsPageProps {
-  onPageChange: (page: string, data?: any) => void;
-}
+const ProductsPage = () => {
+  const navigate = useNavigate();
 
-const ProductsPage: React.FC<ProductsPageProps> = ({ onPageChange }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
 
   const categories = ['All', 'Cooking Oil', 'Essential Oil', 'Others'];
 
   const filteredProducts = mockProducts.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === 'All' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const handleViewProduct = (product: Product) => {
-    onPageChange('product-detail', product);
+  const handleViewProduct = (product) => {
+    navigate('/product', { state: { product } });
   };
 
   return (
@@ -61,7 +61,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onPageChange }) => {
                 <Filter className="w-4 h-4" />
                 Filters
               </button>
-              
+
               <div className={`${showFilters ? 'block' : 'hidden'} lg:block`}>
                 <div className="flex flex-wrap gap-2">
                   {categories.map((category) => (
@@ -86,7 +86,8 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onPageChange }) => {
         {/* Results Info */}
         <div className="mb-6">
           <p className="text-gray-600">
-            Showing {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
+            Showing {filteredProducts.length} product
+            {filteredProducts.length !== 1 ? 's' : ''}
             {selectedCategory !== 'All' && ` in ${selectedCategory}`}
             {searchTerm && ` matching "${searchTerm}"`}
           </p>
@@ -105,7 +106,9 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onPageChange }) => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No products found matching your criteria.</p>
+            <p className="text-gray-500 text-lg">
+              No products found matching your criteria.
+            </p>
             <button
               onClick={() => {
                 setSearchTerm('');
