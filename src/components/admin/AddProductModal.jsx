@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Modal from "../common/Modal";
+import { deleteSingleProducts } from "../../api/admin/products";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData }) => {
@@ -40,11 +41,41 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
     };
 
     // Delete preview image
-    const removeImage = (index) => {
-        setForm({
-            ...form,
-            images: form.images.filter((_, i) => i !== index),
-        });
+
+    const removeImage = async (index) => {
+        const imageToDelete = form.images[index];
+
+        // If editing + image is from backend → delete from server
+        if (initialData && !imageToDelete.file) {
+            const imageUrl = imageToDelete.replace(BASE_URL, "");
+
+            try {
+                const response = await deleteSingleProducts({product_id:initialData._id, image_url:imageUrl});
+
+                if (!response.status) {
+                    showToast(response.message, "error");
+                    return;
+                }
+                showToast(response.message, "success");
+
+                // Remove from UI after successful delete
+                setForm((prev) => ({
+                    ...prev,
+                    images: prev.images.filter((_, i) => i !== index),
+                }));
+
+            } catch (error) {
+                console.error("Delete error:", error);
+                alert("Failed to delete image. Please try again.");
+            }
+
+        } else {
+            // If new uploaded image → just remove from preview
+            setForm((prev) => ({
+                ...prev,
+                images: prev.images.filter((_, i) => i !== index),
+            }));
+        }
     };
 
     // Handle image uploading
@@ -138,7 +169,7 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
                         className="w-full mt-1 border rounded p-2"
                     />
                 </div>
-                
+
                 <div className="flex flex-row gap-20">
                     {/* Status */}
                     <div className="flex items-center space-x-2">
