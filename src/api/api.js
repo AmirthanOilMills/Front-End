@@ -32,7 +32,7 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       console.warn("Unauthorized! Redirecting to login...");
       // Optionally redirect to login page
-      // window.location.href = "/login";
+      // window.location.href = "/";
     }
     return Promise.reject(error);
   }
@@ -41,59 +41,52 @@ api.interceptors.response.use(
 // ====== REQUEST HELPERS ======
 
 export const getRequest = async (endpoint, params = {}) => {
-  try {
-    const response = await api.get(endpoint, { params });
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
+  const response = await api.get(endpoint, { params });
+  return response.data;
 };
 
 export const postRequest = async (endpoint, data = {}) => {
-  try {
-    const response = await api.post(endpoint, data);
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
+  const isFormData = data instanceof FormData;
+
+  const response = await api.post(endpoint, data, {
+    headers: isFormData
+      ? { "Content-Type": "multipart/form-data" }
+      : {},
+  });
+
+  return response.data;
 };
 
 export const putRequest = async (endpoint, data = {}) => {
-  try {
-    const response = await api.put(endpoint, data);
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
+  const isFormData = data instanceof FormData;
+
+  const response = await api.put(endpoint, data, {
+    headers: isFormData
+      ? { "Content-Type": "multipart/form-data" }
+      : {},
+  });
+
+  return response.data;
 };
 
 export const deleteRequest = async (endpoint, data = {}) => {
-  try {
-    const response = await api.delete(endpoint, { data });
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
+  const response = await api.delete(endpoint, { data });
+  return response.data;
 };
 
 // ====== FORM DATA HELPER ======
 
-export const formDataRequest = async (endpoint, formData) => {
-  try {
-    const response = await api.post(endpoint, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
+// export const formDataRequest = async (endpoint, formData) => {
+//   try {
+//     const response = await api.post(endpoint, formData, {
+//       headers: { "Content-Type": "multipart/form-data" },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     handleError(error);
+//   }
+// };
 
-// ====== COMMON ERROR HANDLER ======
 
-const handleError = (error) => {
-  console.error("API Error:", error?.response?.data || error.message);
-  throw error?.response?.data || error;
-};
 
 export default api;

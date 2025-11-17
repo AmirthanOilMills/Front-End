@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { User, Lock, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
 import { login } from '../../api/auth';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../../contexts/AuthContext"; // ✅ correct
 
-const AdminLoginPage = ({ onPageChange }) => {
+const AdminLoginPage = () => {
+  const navigate = useNavigate();
+  const { setLogin } = useAuth();
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -11,8 +15,6 @@ const AdminLoginPage = ({ onPageChange }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // const { login } = useAuth();
 
   const handleInputChange = (e) => {
     setFormData({
@@ -27,16 +29,25 @@ const AdminLoginPage = ({ onPageChange }) => {
     setIsSubmitting(true);
     setError('');
 
-    const success = await login(formData);
-    
-    if (success) {
-      onPageChange('admin-dashboard');
-    } else {
-      setError('Invalid email or password');
+    try {
+      const res = await login(formData);
+      console.log(res);
+
+      if (res?.status) {
+        setLogin(res.user);
+        navigate(res.dashboard);
+      } else {
+        setError(res?.message || "Login failed");
+      }
+
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(err?.message);
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    setIsSubmitting(false);
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -140,7 +151,7 @@ const AdminLoginPage = ({ onPageChange }) => {
 
           <div className="mt-6 text-center">
             <button
-              onClick={() => onPageChange('home')}
+              onClick={() => navigate('/')}
               className="text-green-600 hover:text-green-500 text-sm font-medium"
             >
               ← Back to Store

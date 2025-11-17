@@ -1,36 +1,24 @@
-import React, { createContext, useContext, useState } from 'react';
-import { mockAdmins } from '../data/mockData';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [currentAdmin, setCurrentAdmin] = useState(null);
+  const [user,setUser] = useState(null);
 
-  const login = async (email, password) => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const admin = mockAdmins.find(a => a.email === email && a.password === password);
-
-    if (admin) {
-      setCurrentAdmin(admin);
-      return true;
-    }
-
-    return false;
+  const setLogin = (user) => {
+    setUser(user);
   };
-
+  // Logout
   const logout = () => {
-    setCurrentAdmin(null);
+    setUser(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
-        currentAdmin,
-        login,
+        user,
+        setLogin, // <-- use this after your API call
         logout,
-        isAuthenticated: !!currentAdmin,
       }}
     >
       {children}
@@ -38,10 +26,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
