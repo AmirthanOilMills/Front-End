@@ -15,3 +15,7 @@ export function deleteProducts(data){
 export function updateProducts(id,data){
     return putRequest(`/admin/products/${id}`,data)
 }
+
+export function deleteSingleProducts(data){
+    return postRequest(`/admin/products/delete`,data)
+}   

@@ -14,7 +14,7 @@ const Modal = ({ isOpen, onClose, title, children, width = "max-w-lg" }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 animate-fadeIn"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 animate-fadeIn h-[100%] min-h-screen"
       onClick={onClose} // Close when clicking background
     >
       <div
@@ -22,7 +22,7 @@ const Modal = ({ isOpen, onClose, title, children, width = "max-w-lg" }) => {
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
         {/* Header */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 sticky">
           <h2 className="text-xl font-semibold">{title}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-black">
             ✖
