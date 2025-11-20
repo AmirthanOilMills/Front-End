@@ -70,7 +70,7 @@ const Header = () => {
           </nav>
 
           {/* Right Side Icons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center md:space-x-4">
             {/* Wishlist */}
             <button
               onClick={() => navigate('/wishlist')}

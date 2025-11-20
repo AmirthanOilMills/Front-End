@@ -4,7 +4,7 @@ export function addCategory(data){
     return postRequest('/admin/category',data);
 }
 
-export function getAllCategory(page,limit){
+export function getAllCategory(page="",limit=""){
     return getRequest(`/admin/category?page=${page}&limit=${limit}`);
 }
 

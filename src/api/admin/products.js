@@ -4,7 +4,7 @@ export function addProducts(data){
     return postRequest('/admin/products',data);
 }
 
-export function getAllProducts(page,limit){
+export function getAllProducts(page="",limit=""){
     return getRequest(`/admin/products?page=${page}&limit=${limit}`);
 }
 

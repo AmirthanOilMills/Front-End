@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Modal from "../common/Modal";
+import { showToast } from "../common/Toast";
 import { deleteSingleProducts } from "../../api/admin/products";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData }) => {
+
     const [form, setForm] = useState({
         product_name: "",
         product_desc: "",
@@ -14,78 +16,116 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
         images: [],
         health_benefits: [],
     });
+
     const [benefitInput, setBenefitInput] = useState("");
+    useEffect(() => {
+        if (!isOpen) {
+            // reset form when modal closes
+            setForm({
+                product_name: "",
+                product_desc: "",
+                category_id: "",
+                price: "",
+                stock: true,
+                is_active: true,
+                images: [],
+                health_benefits: [],
+            });
+            setBenefitInput("");
+        }
+    }, [isOpen]);
     // Load initial data when editing
     useEffect(() => {
         if (initialData) {
+            // Load edit data
             setForm({
                 product_name: initialData.product_name || "",
                 product_desc: initialData.product_desc || "",
                 category_id: initialData.category_id._id || "",
-                stock: initialData.stock || true,
-                is_active: initialData.is_active || true,
                 price: initialData.price || "",
-                images: initialData.images?.map(img => `${BASE_URL}${img}`) || [],
+                stock: initialData.stock ?? true,
+                is_active: initialData.is_active ?? true,
+                images: initialData.images?.map(img => ({
+                    url: `${BASE_URL}${img}`,
+                    file: null,
+                })) || [],
                 health_benefits: initialData.health_benefits || [],
             });
+        } else {
+            // CLEAR when switching to add mode
+            setForm({
+                product_name: "",
+                product_desc: "",
+                category_id: "",
+                price: "",
+                stock: true,
+                is_active: true,
+                images: [],
+                health_benefits: [],
+            });
+            setBenefitInput("");
         }
     }, [initialData]);
+    
 
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setForm({
-            ...form,
-            [name]: type === "checkbox" ? checked : value,
-        });
+        setForm({ ...form, [name]: type === "checkbox" ? checked : value });
     };
 
-    // Delete preview image
 
+    // Delete Image
     const removeImage = async (index) => {
-        const imageToDelete = form.images[index];
+        const image = form.images[index];
 
-        // If editing + image is from backend → delete from server
-        if (initialData && !imageToDelete.file) {
-            const imageUrl = imageToDelete.replace(BASE_URL, "");
+        // If it is an existing image → delete from server
+        if (initialData && image.file === null) {
+            const imageUrl = image.url.replace(BASE_URL, "");
 
             try {
-                const response = await deleteSingleProducts({product_id:initialData._id, image_url:imageUrl});
+                const response = await deleteSingleProducts({
+                    product_id: initialData._id,
+                    image_url: imageUrl,
+                });
 
                 if (!response.status) {
                     showToast(response.message, "error");
                     return;
                 }
+
                 showToast(response.message, "success");
 
-                // Remove from UI after successful delete
-                setForm((prev) => ({
+                setForm(prev => ({
                     ...prev,
                     images: prev.images.filter((_, i) => i !== index),
                 }));
-
-            } catch (error) {
-                console.error("Delete error:", error);
-                alert("Failed to delete image. Please try again.");
+            } catch (err) {
+                showToast("Failed to delete image", "error");
             }
+        }
 
-        } else {
-            // If new uploaded image → just remove from preview
-            setForm((prev) => ({
+        // If new image → only remove locally
+        else {
+            setForm(prev => ({
                 ...prev,
                 images: prev.images.filter((_, i) => i !== index),
             }));
         }
     };
 
-    // Handle image uploading
+
+    // Upload new files
     const handleFileUpload = useCallback((files) => {
         const newImages = Array.from(files).map((file) => ({
             file,
-            preview: URL.createObjectURL(file),
+            url: URL.createObjectURL(file),
         }));
 
-        setForm((prev) => ({ ...prev, images: [...prev.images, ...newImages] }));
+        setForm(prev => ({
+            ...prev,
+            images: [...prev.images, ...newImages],
+        }));
     }, []);
 
     const handleDrop = (e) => {
@@ -97,21 +137,32 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
         handleFileUpload(e.target.files);
     };
 
+
     // Add health benefit
     const addBenefit = () => {
         if (!benefitInput.trim()) return;
-        setForm({
-            ...form,
-            health_benefits: [...form.health_benefits, benefitInput.trim()],
-        });
+
+        setForm(prev => ({
+            ...prev,
+            health_benefits: [...prev.health_benefits, benefitInput.trim()],
+        }));
+
         setBenefitInput("");
     };
 
+
     // Submit form
     const handleSubmit = () => {
-        const processedImages = form.images.map((img) => (img.file ? img.file : img));
-        onSubmit({ ...form, images: processedImages });
+
+        onSubmit({
+            ...form,
+            images: form.images.map(img => ({
+                url: img.url || null,
+                file: img.file || null,
+            })),
+        });
     };
+
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Add / Edit Product" width="max-w-2xl">
@@ -140,7 +191,7 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
                     />
                 </div>
 
-                {/* Categories */}
+                {/* Category */}
                 <div>
                     <label className="font-medium">Category</label>
                     <select
@@ -170,8 +221,8 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
                     />
                 </div>
 
+                {/* Active + Stock */}
                 <div className="flex flex-row gap-20">
-                    {/* Status */}
                     <div className="flex items-center space-x-2">
                         <input
                             type="checkbox"
@@ -179,9 +230,9 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
                             checked={form.is_active}
                             onChange={handleChange}
                         />
-                        <label className="text-sm font-medium">Active</label>
+                        <label>Active</label>
                     </div>
-                    {/* Stock */}
+
                     <div className="flex items-center space-x-2">
                         <input
                             type="checkbox"
@@ -189,11 +240,11 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
                             checked={form.stock}
                             onChange={handleChange}
                         />
-                        <label className="text-sm font-medium">In Stock</label>
+                        <label>In Stock</label>
                     </div>
                 </div>
 
-                {/* Dropzone */}
+                {/* Image Upload */}
                 <div>
                     <label className="font-medium">Images</label>
 
@@ -204,6 +255,7 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
                         onClick={() => document.getElementById("imageUploadInput").click()}
                     >
                         <p className="text-gray-600">Drag & drop OR click to upload</p>
+
                         <input
                             id="imageUploadInput"
                             type="file"
@@ -220,7 +272,7 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
                             {form.images.map((img, index) => (
                                 <div key={index} className="relative">
                                     <img
-                                        src={img.preview || img}
+                                        src={img.url}
                                         className="h-28 w-full rounded object-cover border"
                                     />
                                     <button
@@ -255,14 +307,11 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
 
                     <ul className="mt-3 space-y-1">
                         {form.health_benefits.map((b, i) => (
-                            <li key={i} className="text-sm text-gray-700">
-                                • {b}
-                            </li>
+                            <li key={i} className="text-sm text-gray-700">• {b}</li>
                         ))}
                     </ul>
                 </div>
 
-                {/* Submit */}
                 <button
                     onClick={handleSubmit}
                     className="w-full bg-green-800 text-white rounded py-2 mt-4"

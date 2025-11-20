@@ -23,6 +23,7 @@ const ProductsTab = () => {
   useEffect(() => {
     loadProducts();
   }, [currentPage]);
+  
 
   const loadCategories = async () => {
     try {
@@ -51,7 +52,7 @@ const ProductsTab = () => {
 
     try {
       const res = await deleteProducts(id);
-      if (res.success) {
+      if (res.status) {
         showToast(res.message, "success");
         loadProducts();
       } else showToast(res.message, "error");
@@ -61,6 +62,10 @@ const ProductsTab = () => {
   };
 
   const handleAddProduct = async (data) => {
+    if (!data.images || data.images.length === 0) {
+      showToast("Please upload at least one image", "error");
+      return;
+    }
     const formData = new FormData();
 
     formData.append("product_name", data.product_name);
@@ -70,32 +75,37 @@ const ProductsTab = () => {
     formData.append("stock", data.stock);
     formData.append("is_active", data.is_active);
 
-    data.health_benefits.forEach((b) => formData.append("health_benefits[]", b));
+    data.health_benefits.forEach((b) =>
+      formData.append("health_benefits[]", b)
+    );
 
-    data.images.forEach((file) => {
-      formData.append("images", file);
+    // FIX: correct image separation
+    data.images.forEach((img) => {
+      if (img.file) {
+        formData.append("images", img.file);
+      } else {
+        formData.append("old_images[]", img.url.replace(BASE_URL, ""));
+      }
     });
 
-    try {
-      let res;
+    let res;
 
-      if (editData) {
-        res = await updateProducts(editData._id, formData);
-      } else {
-        res = await addProducts(formData);
-      }
+    if (editData) {
+      res = await updateProducts(editData._id, formData);
+    } else {
+      res = await addProducts(formData);
+    }
 
-      if (res.success) {
-        showToast(res.message, "success");
-        setOpen(false);
-        setEditData(null);
-        loadProducts();
-      } else showToast(res.message, "error");
-
-    } catch (err) {
-      showToast("Error saving product", "error");
+    if (res.success || res.status) {
+      showToast(res.message, "success");
+      setOpen(false);
+      setEditData(null);
+      loadProducts();
+    } else {
+      showToast(res.message, "error");
     }
   };
+
 
   return (
     <div className="space-y-6">
