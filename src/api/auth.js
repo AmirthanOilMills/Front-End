@@ -11,3 +11,7 @@ export function register(data){
 export function getCurrentUser(){
     return getRequest('/auth/get-user')
 }
+
+export function logOut(){
+    return getRequest('/auth/logout')
+}

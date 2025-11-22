@@ -6,13 +6,15 @@ import TabNav from "./TabNav";
 import OverviewTab from "./Tabs/OverviewTab";
 import ProductsTab from "./Tabs/ProductsTab";
 import OrdersTab from "./Tabs/OrdersTab";
-import AdminsTab from "./Tabs/AdminsTab";
+import AdminsTab from "./Tabs/UsersTab";
 import CategoriesTab from "./Tabs/CategoriesTab"
+import { logOut } from "../../api/auth";
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logOut();
     logout();
     navigate("/");
   };
