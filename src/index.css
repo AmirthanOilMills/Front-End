@@ -4,59 +4,119 @@
 
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fadeIn {
-    animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.2s ease-out;
 }
 
 
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .animate-slide-in {
-    animation: slideIn 0.3s ease-out forwards;
+  animation: slideIn 0.3s ease-out forwards;
 }
 
 /* For Chrome, Edge, Safari */
 ::-webkit-scrollbar {
-    width: 10px;
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  /* Track color */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #166534;
+  /* Scrollbar color */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #166534;
+  /* On hover */
+}
+
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #166534 #f1f1f1;
+}
+
+/* Full screen container */
+/* Full screen container */
+.loading-wrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Transparent + blur background */
+.blur-bg {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(12px); 
+  background: rgba(255, 255, 255, 0.2); /* transparent glass effect */
+}
+
+/* Center container */
+.loader-container {
+  position: relative;
+  z-index: 10;
+}
+
+/* Rotating oil drop */
+/* Oil drop reveal animation */
+.oil-drop-reveal {
+  width: 150px;
+  overflow: hidden;
+  animation: revealDrop 1.5s ease-in-out forwards;
+}
+
+@keyframes revealDrop {
+  0% {
+    clip-path: inset(100% 0 0 0 round 50% 50% 0 0); /* hidden from top */
+    transform: translateY(-40px) scale(0.9);
+    opacity: 0;
   }
-  
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;     /* Track color */
+
+  40% {
+    clip-path: inset(0% 0 0 0 round 50%);
+    transform: translateY(0px) scale(1.03, 0.97); /* squash effect */
+    opacity: 1;
   }
-  
-  ::-webkit-scrollbar-thumb {
-    background: #166534;     /* Scrollbar color */
-    border-radius: 10px;
+
+  70% {
+    transform: translateY(-6px) scale(0.98, 1.02); /* wobble upward */
   }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: #166534;     /* On hover */
+
+  100% {
+    clip-path: inset(0% 0 0 0);
+    transform: translateY(0px) scale(1);
+    opacity: 1;
   }
-  
-  /* Firefox support */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: #166534 #f1f1f1;
-  }
-  
+}
