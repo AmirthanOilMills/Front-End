@@ -9,6 +9,7 @@ import OrdersTab from "./Tabs/OrdersTab";
 import AdminsTab from "./Tabs/UsersTab";
 import CategoriesTab from "./Tabs/CategoriesTab"
 import { logOut } from "../../api/auth";
+import PaymentTab from "./Tabs/PaymentTab";
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -57,6 +58,7 @@ const AdminDashboard = () => {
           <Route path="categories" element={<CategoriesTab />} />
           <Route path="products" element={<ProductsTab />} />
           <Route path="orders" element={<OrdersTab />} />
+          <Route path="payments" element={<PaymentTab />} />
           {user?.role == "admin" && (
             <Route path="admins" element={<AdminsTab />} />
           )}

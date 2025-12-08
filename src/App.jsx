@@ -33,6 +33,7 @@ import ContactPage from "./pages/ContactPage";
 // 🔐 Admin Pages
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import OrderPage from "./pages/OrderPage";
 
 
 // ------------------------------------------------------
@@ -63,6 +64,7 @@ function AppRoutes() {
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/product" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/orders" element={<OrderPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/about" element={<AboutPage />} />
