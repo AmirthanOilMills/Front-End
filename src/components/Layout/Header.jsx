@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Heart, Menu, X, User, Phone } from 'lucide-react';
-import { useCart } from '../../contexts/CartContext';
-import { useWishlist } from '../../contexts/WishlistContext';
+import { ShoppingCart, Heart, Menu, X, User, Phone , Truck  } from 'lucide-react';
+import useStore from '../../helpers/useStore'; // Zustand store
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { getItemCount } = useCart();
-  const { wishlist } = useWishlist();
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Zustand store
+  const cart = useStore((state) => state.cart);
+  const wishlist = useStore((state) => state.wishlist);
+  const orders = useStore((state) => state.orders);
+
+  // Count functions
+  const cartCount = cart.reduce((total, item) => total + item.qty, 0);
+  const wishlistCount = wishlist.length;
+  const ordersCount = orders.length; 
+
+  // Navigation items
   const navigation = [
     { name: 'Home', path: '/' },
     { name: 'Products', path: '/products' },
@@ -58,11 +66,10 @@ const Header = () => {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(item.path)
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive(item.path)
                     ? 'bg-green-100 text-green-800'
                     : 'text-gray-700 hover:text-green-800 hover:bg-green-50'
-                }`}
+                  }`}
               >
                 {item.name}
               </button>
@@ -77,9 +84,9 @@ const Header = () => {
               className="p-2 text-gray-600 hover:text-green-800 relative"
             >
               <Heart className="w-6 h-6" />
-              {wishlist.items.length > 0 && (
+              {wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
-                  {wishlist.items.length}
+                  {wishlistCount}
                 </span>
               )}
             </button>
@@ -90,9 +97,23 @@ const Header = () => {
               className="p-2 text-gray-600 hover:text-green-800 relative"
             >
               <ShoppingCart className="w-6 h-6" />
-              {getItemCount() > 0 && (
+              {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
-                  {getItemCount()}
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
+
+            {/* Cart */}
+            <button
+              onClick={() => navigate('/orders')}
+              className="p-2 text-gray-600 hover:text-green-800 relative"
+            >
+              <Truck   className="w-6 h-6" />
+              {ordersCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                  {ordersCount}
                 </span>
               )}
             </button>
@@ -126,11 +147,10 @@ const Header = () => {
                     navigate(item.path);
                     setIsMenuOpen(false);
                   }}
-                  className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                    isActive(item.path)
+                  className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive(item.path)
                       ? 'bg-green-100 text-green-800'
                       : 'text-gray-700 hover:text-green-800 hover:bg-green-50'
-                  }`}
+                    }`}
                 >
                   {item.name}
                 </button>

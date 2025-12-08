@@ -28,6 +28,7 @@ import ContactPage from "./pages/ContactPage";
 
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import OrderPage from "./pages/OrderPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 import LoadingScreen from "./components/LoadingScreen";
@@ -82,6 +83,7 @@ function AppRoutes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/product" element={<ProductDetailPage />} />
+          <Route path="/orders" element={<OrderPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />

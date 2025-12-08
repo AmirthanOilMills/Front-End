@@ -7,6 +7,7 @@ const TabNav = ({ role }) => {
     { path: "/admin/categories", label: "Categories" },
     { path: "/admin/products", label: "Products" },
     { path: "/admin/orders", label: "Orders" },
+    { path: "/admin/payments", label: "Payments" },
   ];
 
   const tabs =

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllProducts } from "../api/public/products";
 import { getAllCategory } from "../api/public/category";
 import { showToast } from "../components/common/Toast";
+import CategoryDropdown from '../components/common/DropDown';
 
 const ProductsPage = () => {
   const navigate = useNavigate();
@@ -107,7 +108,7 @@ const ProductsPage = () => {
 
               <div className={`${showFilters ? 'block' : 'hidden'} lg:block`}>
                 <div className="flex flex-wrap gap-2">
-                  <button
+                  {/* <button
                     onClick={() => setSelectedCategory("All")}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${selectedCategory === "All"
                       ? 'bg-green-800 text-white'
@@ -115,9 +116,9 @@ const ProductsPage = () => {
                       }`}
                   >
                     All
-                  </button>
+                  </button> */}
 
-                  {categories.map((category) => (
+                  {/* {categories.map((category) => (
                     <button
                       key={category._id}
                       onClick={() => setSelectedCategory(category.category_name)}
@@ -128,7 +129,12 @@ const ProductsPage = () => {
                     >
                       {category.category_name}
                     </button>
-                  ))}
+                  ))} */}
+                  <CategoryDropdown
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onSelect={setSelectedCategory}
+                  />
                 </div>
               </div>
             </div>
