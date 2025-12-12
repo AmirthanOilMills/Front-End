@@ -55,7 +55,7 @@ const CartPage = () => {
               >
                 {/* PRODUCT IMAGE */}
                 <img
-                  src={`http://localhost:5000${item.images?.[0] || "/no-image.png"}`}
+                  src={`${import.meta.env.VITE_BASE_URL}${item.images?.[0] || "/no-image.png"}`}
                   alt={item.product_name}
                   className="w-24 h-24 object-cover rounded-lg"
                 />

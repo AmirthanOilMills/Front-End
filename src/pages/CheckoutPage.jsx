@@ -338,7 +338,7 @@ const CheckoutPage = () => {
             <div className="space-y-4 mb-6">
               {cart.map(item => (
                 <div key={item.id || item._id} className="flex items-center space-x-3">
-                  <img src={`http://localhost:5000${item.images[0]}`} className="w-12 h-12 object-cover rounded" />
+                  <img src={`${import.meta.env.VITE_BASE_URL}${item.images[0]}`} className="w-12 h-12 object-cover rounded" />
                   <div className="flex-1">
                     <p className="text-sm font-medium">{item.product_name}</p>
                     <p className="text-sm text-gray-500">Qty: {item.qty}</p>
