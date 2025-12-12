@@ -1,19 +1,19 @@
-import { getRequest , putRequest ,postRequest } from "../api"
+import { getRequest, putRequest, postRequest } from "../api"
 
 export function getAllOrders(
-    page = 1,
-    limit = 10,
-    search = "",
-    paymentMethod = "",
-    status = ""
+  page = 1,
+  limit = 10,
+  search = "",
+  paymentMethod = "",
+  status = ""
 ) {
-    let query = `/order/allorders?page=${page}&limit=${limit}`;
+  let query = `/order/allorders?page=${page}&limit=${limit}`;
 
-    if (search) query += `&search=${search}`;
-    if (paymentMethod) query += `&paymentMethod=${paymentMethod}`;
-    if (status) query += `&status=${status}`;
-    console.log(query);
-    return getRequest(query);
+  if (search) query += `&search=${search}`;
+  if (paymentMethod) query += `&paymentMethod=${paymentMethod}`;
+  if (status) query += `&status=${status}`;
+  console.log(query);
+  return getRequest(query);
 }
 
 
@@ -41,6 +41,21 @@ export async function updateStatus(id, newStatus) {
     console.error("Failed to update order status:", err);
     throw err; // propagate error to caller
   }
+}
+
+export async function updateOrderStatus(id, newOrderStatus) {
+  try {
+    const res = await putRequest(`/order/update-orderstatus/${id}`, { orderStatus: newOrderStatus });
+    return res;
+  } catch (err) {
+    console.error("Failed to update order status:", err);
+    throw err; // propagate error to caller
+  }
+}
+
+export function getOrderbyOrderId(orderIds) {
+  const res = postRequest("/order/order", { orderIds });
+  return res;
 }
 
 
