@@ -7,7 +7,8 @@ const OrderPage = () => {
   return (
     <div className="max-w-4xl mx-auto py-10">
       <h1 className="text-3xl font-bold mb-6">My Orders</h1>
-
+      <button className={`w-30 mt-4 py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center space-x-2 $
+          bg-green-800 hover:bg-green-900 text-white`}>Get Order Status</button>
       {(!orders || orders.length === 0) ? (
         <p className="text-gray-500">No orders yet.</p>
       ) : (
