@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, Send, MessageCircle } from 'lucide-react';
-
+import { addContactMessage } from '../api/admin/contact';
+import { showToast } from '../components/common/Toast';
 const ContactPage = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    fullName: '',
     email: '',
     phone: '',
     subject: '',
@@ -11,30 +12,76 @@ const ContactPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
+  const [errors, setErrors] = useState({
+    email: "",
+    phone: "",
+  });
   const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    // Validate email
+    if (name === "email") {
+      const emailRegex =
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      setErrors((prev) => ({
+        ...prev,
+        email: emailRegex.test(value) ? "" : "Invalid email format",
+      }));
+    }
+
+    // Validate phone (only digits, length 10)
+    if (name === "phone") {
+      const cleaned = value.replace(/\D/g, ""); // remove non-digits
+      setErrors((prev) => ({
+        ...prev,
+        phone:
+          cleaned.length === 0
+            ? ""
+            : cleaned.length !== 10
+              ? "Phone must be 10 digits"
+              : "",
+      }));
+      setFormData({ ...formData, phone: cleaned });
+      return; // prevent default update
+    }
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (errors.email || errors.phone) {
+      showToast(errors.email|| errors.phone, "error");
+      return;
+    }
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const response = await addContactMessage(formData);
 
-    console.log('Contact form submitted:', formData);
-    setSubmitted(true);
+      const data = response;
+
+      if (data.success) {
+        setSubmitted(true);
+        showToast("Form Submitted", "success");
+      } else {
+        alert(data.message || "Something went wrong");
+        showToast(data.message || "Failed to submit", "error");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Internal server error");
+    }
     setIsSubmitting(false);
-    
+
     // Reset form after 3 seconds
     setTimeout(() => {
       setSubmitted(false);
       setFormData({
-        name: '',
+        fullName: '',
         email: '',
         phone: '',
         subject: '',
@@ -69,7 +116,7 @@ const ContactPage = () => {
           {/* Contact Information */}
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Get in Touch</h2>
-            
+
             <div className="space-y-6 mb-8">
               <div className="flex items-start">
                 <div className="bg-green-100 p-3 rounded-full mr-4">
@@ -84,7 +131,7 @@ const ContactPage = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start">
                 <div className="bg-blue-100 p-3 rounded-full mr-4">
                   <Phone className="w-6 h-6 text-blue-600" />
@@ -97,7 +144,7 @@ const ContactPage = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start">
                 <div className="bg-yellow-100 p-3 rounded-full mr-4">
                   <Mail className="w-6 h-6 text-yellow-600" />
@@ -111,7 +158,7 @@ const ContactPage = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start">
                 <div className="bg-purple-100 p-3 rounded-full mr-4">
                   <Clock className="w-6 h-6 text-purple-600" />
@@ -149,7 +196,7 @@ const ContactPage = () => {
           {/* Contact Form */}
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
-            
+
             {submitted ? (
               <div className="text-center py-8">
                 <div className="bg-green-100 rounded-full p-4 inline-block mb-4">
@@ -169,9 +216,9 @@ const ContactPage = () => {
                     </label>
                     <input
                       type="text"
-                      name="name"
+                      name="fullName"
                       required
-                      value={formData.name}
+                      value={formData.fullName}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="Enter your full name"

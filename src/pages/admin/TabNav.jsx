@@ -8,6 +8,7 @@ const TabNav = ({ role }) => {
     { path: "/admin/products", label: "Products" },
     { path: "/admin/orders", label: "Orders" },
     { path: "/admin/payments", label: "Payments" },
+    { path: "/admin/contact", label: "Contact" },
   ];
 
   const tabs =
@@ -23,10 +24,9 @@ const TabNav = ({ role }) => {
           to={tab.path}
           end
           className={({ isActive }) =>
-            `px-4 py-2 rounded-md font-medium transition-colors ${
-              isActive
-                ? "bg-green-800 text-white"
-                : "text-gray-600 hover:text-green-800 hover:bg-green-50"
+            `px-4 py-2 rounded-md font-medium transition-colors ${isActive
+              ? "bg-green-800 text-white"
+              : "text-gray-600 hover:text-green-800 hover:bg-green-50"
             }`
           }
         >

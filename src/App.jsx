@@ -1,26 +1,22 @@
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
   Outlet,
+  useLocation
 } from "react-router-dom";
-import { getCurrentUser } from "./api/auth";
-import ProtectedRoute from "./ProtectedRoute";
-// 🧩 Context Providers
+
 import { AuthProvider } from "./contexts/AuthContext";
-import { useAuth } from "./contexts/AuthContext"; // ✅ correct
 import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
 
-// 🧱 Layout Components
 import Header from "./components/Layout/Header";
 import Footer from "./components/Layout/Footer";
 import WhatsAppButton from "./components/WhatsAppButton";
 
-// 📄 Public Pages
+// Pages
 import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
@@ -30,22 +26,22 @@ import WishlistPage from "./pages/WishlistPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 
-// 🔐 Admin Pages
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import OrderPage from "./pages/OrderPage";
+import ProtectedRoute from "./ProtectedRoute";
+
+import LoadingScreen from "./components/LoadingScreen";
 
 
-// ------------------------------------------------------
-// 🧭 Layouts
-// ------------------------------------------------------
-
-// Public App Layout
+// ----------------------------
+// Layout
+// ----------------------------
 const AppLayout = () => (
   <div className="min-h-screen flex flex-col">
     <Header />
     <main className="flex-1">
-      <Outlet /> 
+      <Outlet />
     </main>
     <Footer />
     <WhatsAppButton />
@@ -53,40 +49,69 @@ const AppLayout = () => (
 );
 
 
-// ------------------------------------------------------
-// 🚏 Application Routes
-// ------------------------------------------------------
+// ----------------------------
+// Loader Wrapper (FIX)
+// ----------------------------
+function LoaderWrapper() {
+  const location = useLocation();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
+  return loading ? <LoadingScreen /> : <Outlet />;
+}
+
+
+// ----------------------------
+// Routes
+// ----------------------------
 function AppRoutes() {
   return (
     <Routes>
-      <Route element={<AppLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/product" element={<ProductDetailPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/orders" element={<OrderPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/wishlist" element={<WishlistPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/contact" element={<ContactPage />} />
+
+      {/* 🔥 Loader wrapper for all public pages */}
+      <Route element={<LoaderWrapper />}>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/product" element={<ProductDetailPage />} />
+          <Route path="/orders" element={<OrderPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+        </Route>
       </Route>
+
+      {/* Admin */}
       <Route path="/login" element={<AdminLoginPage />} />
-      {/* 🔐 Admin Routes */}
-      <Route path="/admin/*" element={
-        <ProtectedRoute>
-          <AdminDashboard />
-        </ProtectedRoute>
-      } />
+      <Route
+        path="/admin/*"
+        element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
 
 
-// ------------------------------------------------------
-// 🚀 Main App Component
-// ------------------------------------------------------
-function App() {
+// ----------------------------
+// Final App Wrapper
+// ----------------------------
+export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
@@ -99,5 +124,3 @@ function App() {
     </AuthProvider>
   );
 }
-
-export default App;
