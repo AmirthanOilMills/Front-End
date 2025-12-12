@@ -75,7 +75,7 @@ const CheckoutPage = () => {
       try {
         const res = await createCODOrder(orderData);
         console.log(res);
-        addOrder(res.order); // Add COD order to store
+        addOrder(res.order.orderId); // Add COD order to store
         clearCart();
         setOrderPlaced(true);
       } catch (err) {
@@ -129,7 +129,7 @@ const CheckoutPage = () => {
             });
 
             //  Add verified order to store
-            addOrder(verifyRes.order);
+            addOrder(verifyRes.order.orderId);
 
             clearCart();
             setOrderPlaced(true);
