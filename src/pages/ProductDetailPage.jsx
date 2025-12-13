@@ -81,7 +81,7 @@ const ProductDetailPage = () => {
               onMouseLeave={() => setIsHovered(false)}
             >
               <img
-                src={`http://localhost:5000${product.images[currentIndex]}`}
+                src={`${import.meta.env.VITE_BASE_URL}${product.images[currentIndex]}`}
                 alt={product.product_name}
                 className="w-full h-full object-cover"
               />

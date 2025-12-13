@@ -69,7 +69,7 @@ const ProductCard = ({ product, onViewDetails }) => {
         onMouseLeave={() => setIsHovered(false)}
       >
         <img
-          src={`http://localhost:5000${images[currentIndex]}`}
+          src={`${import.meta.env.VITE_BASE_URL}${images[currentIndex]}`}
           alt={product.product_name}
           className="w-full h-full object-cover transition-all duration-500"
         />

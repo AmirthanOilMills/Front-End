@@ -1,37 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React ,{useState,useEffect}from 'react';
 import { ArrowRight, Leaf, Award, Truck, Users, Star } from 'lucide-react';
 import { mockProducts, mockTestimonials } from '../data/mockData';
 import ProductCard from '../components/ProductCard';
 import { useNavigate } from 'react-router-dom';
+import { showToast } from "../components/common/Toast";
 import { getAllProducts } from "../api/public/products";
 
 const HomePage = () => {
   const navigate = useNavigate();
-
-
-  const [products, setProducts] = useState([]);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const limit = 4; // products per page
-  const [totalPages, setTotalPages] = useState(1);
-
+  const [featuredProducts,setFeaturedProducts]=useState([]);
+  // const featuredProducts = mockProducts.slice(0, 4);
   useEffect(() => {
     loadProducts();
   }, []);
-
-
   const loadProducts = async () => {
     try {
-      const res = await getAllProducts(currentPage, limit);
+      console.log("dfdssd")
+
+      const res = await getAllProducts(1, 8);
       if (res.success) {
-        setProducts(res.products);
-        setTotalPages(res.totalPages);
+        setFeaturedProducts(res.products);
       } else showToast(res.message || "Failed to load products", "error");
     } catch (err) {
       showToast("Error loading products", "error");
     }
   };
-
   const handleViewProduct = (product) => {
     navigate('/product', { state: { product } });
   };
