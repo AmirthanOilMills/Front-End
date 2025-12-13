@@ -4,6 +4,7 @@ import { mockProducts, mockAdmins } from "../../../data/mockData";
 import StatsCard from "../StatsCard";
 import { getDashboardStats } from "../../../api/admin/dashboard";
 import { getAllOrders } from "../../../api/public/Order";
+import { showToast } from "../../../components/common/Toast";
 
 const OverviewTab = () => {
   const [statsCount, setStatsCount] = useState({
@@ -52,12 +53,6 @@ const OverviewTab = () => {
       showToast("Error loading products", "error");
     }
   };
-
-  const mockOrders = [
-    { id: "1", customer: "John Doe", total: 599, status: "processing", date: "2024-01-15" },
-    { id: "2", customer: "Jane Smith", total: 899, status: "shipped", date: "2024-01-14" },
-    { id: "3", customer: "Bob Johnson", total: 299, status: "delivered", date: "2024-01-13" },
-  ];
 
   const stats = [
     { title: "Total Products", value: statsCount?.totalProducts || 0, icon: Package, color: "bg-blue-500" },

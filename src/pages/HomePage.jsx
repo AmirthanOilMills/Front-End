@@ -9,10 +9,13 @@ import { getAllProducts } from "../api/public/products";
 const HomePage = () => {
   const navigate = useNavigate();
   const [featuredProducts,setFeaturedProducts]=useState([]);
-  // const featuredProducts = mockProducts.slice(0, 4);
+
+
   useEffect(() => {
     loadProducts();
   }, []);
+
+  
   const loadProducts = async () => {
     try {
       console.log("dfdssd")
@@ -29,7 +32,6 @@ const HomePage = () => {
     navigate('/product', { state: { product } });
   };
 
-  const featuredProducts = products.slice(0, 4);
 
 
   return (
