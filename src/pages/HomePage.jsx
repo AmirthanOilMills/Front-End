@@ -1,17 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, Leaf, Award, Truck, Users, Star } from 'lucide-react';
 import { mockProducts, mockTestimonials } from '../data/mockData';
 import ProductCard from '../components/ProductCard';
 import { useNavigate } from 'react-router-dom';
+import { getAllProducts } from "../api/public/products";
 
 const HomePage = () => {
   const navigate = useNavigate();
 
-  const featuredProducts = mockProducts.slice(0, 4);
+
+  const [products, setProducts] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 4; // products per page
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+
+  const loadProducts = async () => {
+    try {
+      const res = await getAllProducts(currentPage, limit);
+      if (res.success) {
+        setProducts(res.products);
+        setTotalPages(res.totalPages);
+      } else showToast(res.message || "Failed to load products", "error");
+    } catch (err) {
+      showToast("Error loading products", "error");
+    }
+  };
 
   const handleViewProduct = (product) => {
     navigate('/product', { state: { product } });
   };
+
+  const featuredProducts = products.slice(0, 4);
+
 
   return (
     <div className="min-h-screen">

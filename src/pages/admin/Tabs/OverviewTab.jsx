@@ -1,9 +1,58 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Package, ShoppingCart, TrendingUp, Users } from "lucide-react";
 import { mockProducts, mockAdmins } from "../../../data/mockData";
 import StatsCard from "../StatsCard";
+import { getDashboardStats } from "../../../api/admin/dashboard";
+import { getAllOrders } from "../../../api/public/Order";
 
 const OverviewTab = () => {
+  const [statsCount, setStatsCount] = useState({
+    totalProducts: 0,
+    totalOrders: 0,
+    totalRevenue: 0,
+    totalAdmins: 0,
+  });
+  const [orders, setOrders] = useState([]);
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterMethod, setFilterMethod] = useState("");
+  const [search, setSearch] = useState("");
+
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [limit] = useState(3);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    dashboardstats();
+  }, []);
+  useEffect(() => {
+    fetchOrders();
+  }, [page, search, filterMethod, filterStatus]);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await getAllOrders(page, limit, search, filterMethod, filterStatus);
+      console.log(res);
+      setOrders(res.orders || []);
+      setTotalPages(res.totalPages || 1);
+    } catch (err) {
+      console.error("Error fetching orders:", err);
+    }
+  };
+
+
+  const dashboardstats = async () => {
+    try {
+      const res = await getDashboardStats();
+      console.log(res);
+      if (res.success) {
+        setStatsCount(res.data);
+      } else showToast(res.message || "Failed to load products", "error");
+    } catch (err) {
+      showToast("Error loading products", "error");
+    }
+  };
+
   const mockOrders = [
     { id: "1", customer: "John Doe", total: 599, status: "processing", date: "2024-01-15" },
     { id: "2", customer: "Jane Smith", total: 899, status: "shipped", date: "2024-01-14" },
@@ -11,10 +60,10 @@ const OverviewTab = () => {
   ];
 
   const stats = [
-    { title: "Total Products", value: mockProducts.length, icon: Package, color: "bg-blue-500" },
-    { title: "Total Orders", value: mockOrders.length, icon: ShoppingCart, color: "bg-green-500" },
-    { title: "Total Revenue", value: `₹${mockOrders.reduce((sum, o) => sum + o.total, 0)}`, icon: TrendingUp, color: "bg-yellow-500" },
-    { title: "Active Admins", value: mockAdmins.length, icon: Users, color: "bg-purple-500" },
+    { title: "Total Products", value: statsCount?.totalProducts || 0, icon: Package, color: "bg-blue-500" },
+    { title: "Total Orders", value: statsCount?.totalOrders || 0, icon: ShoppingCart, color: "bg-green-500" },
+    { title: "Total Revenue", value: statsCount?.totalRevenue || 0, icon: TrendingUp, color: "bg-yellow-500" },
+    { title: "Active Admins", value: statsCount?.totalAdmins || 0, icon: Users, color: "bg-purple-500" },
   ];
 
   return (
@@ -42,25 +91,34 @@ const OverviewTab = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {mockOrders.map((order) => (
+              {orders.map((order) => (
                 <tr key={order.id}>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">#{order.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{order.customer}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">#{order.orderId}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{order.userName}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">₹{order.total}</td>
                   <td className="px-6 py-4 text-sm">
                     <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        order.status === "delivered"
-                          ? "bg-green-100 text-green-800"
-                          : order.status === "shipped"
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${order.status === "delivered"
+                        ? "bg-green-100 text-green-800"
+                        : order.status === "shipped"
                           ? "bg-blue-100 text-blue-800"
                           : "bg-yellow-100 text-yellow-800"
-                      }`}
+                        }`}
                     >
                       {order.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{order.date}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {new Date(order.createdAt).toLocaleString("en-IN", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </td>
+
                 </tr>
               ))}
             </tbody>
