@@ -55,7 +55,7 @@ const Header = () => {
             className="flex-shrink-0 cursor-pointer"
             onClick={() => navigate('/')}
           >
-            <h1 className="text-2xl font-bold text-green-800">
+            <h1 className="sm:text-2xl font-bold text-green-800 text-xl">
               Amirthan <span className="text-yellow-500">Oil Mills</span>
             </h1>
           </div>

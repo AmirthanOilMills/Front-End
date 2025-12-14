@@ -19,7 +19,7 @@ const row1Infinite = [...row1Images, ...row1Images];
 const row2Infinite = [...row2Images, ...row2Images];
 import { useNavigate } from "react-router-dom";
 const AboutPage = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   useScrollAnimation();
   return (
     <div className="min-h-screen bg-gray-50">
@@ -67,17 +67,18 @@ const AboutPage = () => {
                 </p>
               </div>
             </div>
-            <div className="animate slide-in-right">
-              <iframe
-                width="560"
-                height="315"
-                src="https://www.youtube.com/embed/vMOTJJLi44o?si=AxmgsaJl9ny2CEZ0"
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
+            <div className="animate slide-in-right w-full">
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                  src="https://www.youtube.com/embed/vMOTJJLi44o?si=AxmgsaJl9ny2CEZ0"
+                  title="YouTube video player"
+                  className="absolute inset-0 w-full h-full"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -334,8 +335,10 @@ const AboutPage = () => {
             Join thousands of satisfied customers who trust Amirthan Oil Mills
             for their family's health and nutrition needs.
           </p>
-          <button className="bg-yellow-500 hover:bg-yellow-600 text-green-900 font-bold py-4 px-8 rounded-lg text-lg transition-colors animate slide-in-bottom"
-          onClick={()=>navigate('/products')}>
+          <button
+            className="bg-yellow-500 hover:bg-yellow-600 text-green-900 font-bold py-4 px-8 rounded-lg text-lg transition-colors animate slide-in-bottom"
+            onClick={() => navigate("/products")}
+          >
             Shop Our Products
           </button>
         </div>
