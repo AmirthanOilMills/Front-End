@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send, MessageCircle } from 'lucide-react';
-import { addContactMessage } from '../api/admin/contact';
-import { showToast } from '../components/common/Toast';
+import React, { useState } from "react";
+import { MapPin, Phone, Mail, Clock, Send, MessageCircle } from "lucide-react";
+import { addContactMessage } from "../api/admin/contact";
+import { showToast } from "../components/common/Toast";
+import useScrollAnimation from "../helpers/useScrollAnimation";
 const ContactPage = () => {
+  useScrollAnimation();
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
+    fullName: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -21,8 +23,7 @@ const ContactPage = () => {
 
     // Validate email
     if (name === "email") {
-      const emailRegex =
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       setErrors((prev) => ({
         ...prev,
         email: emailRegex.test(value) ? "" : "Invalid email format",
@@ -38,8 +39,8 @@ const ContactPage = () => {
           cleaned.length === 0
             ? ""
             : cleaned.length !== 10
-              ? "Phone must be 10 digits"
-              : "",
+            ? "Phone must be 10 digits"
+            : "",
       }));
       setFormData({ ...formData, phone: cleaned });
       return; // prevent default update
@@ -54,7 +55,7 @@ const ContactPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (errors.email || errors.phone) {
-      showToast(errors.email|| errors.phone, "error");
+      showToast(errors.email || errors.phone, "error");
       return;
     }
     setIsSubmitting(true);
@@ -81,20 +82,22 @@ const ContactPage = () => {
     setTimeout(() => {
       setSubmitted(false);
       setFormData({
-        fullName: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
+        fullName: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
       });
     }, 3000);
   };
 
   const handleWhatsAppClick = () => {
-    const phoneNumber = '+919876543210';
-    const message = 'Hi! I have a question about your oils.';
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    const phoneNumber = "+919876543210";
+    const message = "Hi! I have a question about your oils.";
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(url, "_blank");
   };
 
   return (
@@ -102,10 +105,11 @@ const ContactPage = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-green-800 to-green-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
+          <div className="text-center animate slide-in-bottom">
             <h1 className="text-4xl lg:text-5xl font-bold mb-6">Contact Us</h1>
             <p className="text-xl lg:text-2xl text-green-100 max-w-3xl mx-auto">
-              Get in touch with us for any questions about our products or services
+              Get in touch with us for any questions about our products or
+              services
             </p>
           </div>
         </div>
@@ -114,8 +118,10 @@ const ContactPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Information */}
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">Get in Touch</h2>
+          <div className="animate slide-in-left">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
+              Get in Touch
+            </h2>
 
             <div className="space-y-6 mb-8">
               <div className="flex items-start">
@@ -123,10 +129,14 @@ const ContactPage = () => {
                   <MapPin className="w-6 h-6 text-green-800" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Our Location</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    Our Location
+                  </h3>
                   <p className="text-gray-600">
-                    123 Main Street<br />
-                    Chennai, Tamil Nadu 600001<br />
+                    123 Main Street
+                    <br />
+                    Chennai, Tamil Nadu 600001
+                    <br />
                     India
                   </p>
                 </div>
@@ -137,9 +147,12 @@ const ContactPage = () => {
                   <Phone className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Phone Numbers</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    Phone Numbers
+                  </h3>
                   <p className="text-gray-600">
-                    Primary: +91 98765 43210<br />
+                    Primary: +91 98765 43210
+                    <br />
                     Alternate: +91 98765 43211
                   </p>
                 </div>
@@ -150,10 +163,14 @@ const ContactPage = () => {
                   <Mail className="w-6 h-6 text-yellow-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Email Address</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    Email Address
+                  </h3>
                   <p className="text-gray-600">
-                    General: info@amirthanoils.com<br />
-                    Orders: orders@amirthanoils.com<br />
+                    General: info@amirthanoils.com
+                    <br />
+                    Orders: orders@amirthanoils.com
+                    <br />
                     Support: support@amirthanoils.com
                   </p>
                 </div>
@@ -164,10 +181,14 @@ const ContactPage = () => {
                   <Clock className="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Business Hours</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    Business Hours
+                  </h3>
                   <p className="text-gray-600">
-                    Monday - Friday: 9:00 AM - 6:00 PM<br />
-                    Saturday: 9:00 AM - 4:00 PM<br />
+                    Monday - Friday: 9:00 AM - 6:00 PM
+                    <br />
+                    Saturday: 9:00 AM - 4:00 PM
+                    <br />
                     Sunday: Closed
                   </p>
                 </div>
@@ -178,10 +199,13 @@ const ContactPage = () => {
             <div className="bg-green-100 p-6 rounded-lg">
               <div className="flex items-center mb-4">
                 <MessageCircle className="w-6 h-6 text-green-600 mr-3" />
-                <h3 className="text-lg font-semibold text-gray-900">Quick Support</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Quick Support
+                </h3>
               </div>
               <p className="text-gray-600 mb-4">
-                Need immediate assistance? Chat with us on WhatsApp for quick responses to your queries.
+                Need immediate assistance? Chat with us on WhatsApp for quick
+                responses to your queries.
               </p>
               <button
                 onClick={handleWhatsAppClick}
@@ -194,17 +218,22 @@ const ContactPage = () => {
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
+          <div className="bg-white rounded-lg shadow-lg p-8 animate slide-in-right h-fit">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Send us a Message
+            </h2>
 
             {submitted ? (
               <div className="text-center py-8">
                 <div className="bg-green-100 rounded-full p-4 inline-block mb-4">
                   <Send className="w-8 h-8 text-green-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Message Sent!
+                </h3>
                 <p className="text-gray-600">
-                  Thank you for contacting us. We'll get back to you within 24 hours.
+                  Thank you for contacting us. We'll get back to you within 24
+                  hours.
                 </p>
               </div>
             ) : (
@@ -311,12 +340,19 @@ const ContactPage = () => {
       </div>
 
       {/* Map Section (Placeholder) */}
-      <section className="bg-gray-200 h-64">
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="text-center">
-            <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-            <p className="text-gray-600">Interactive Map would be embedded here</p>
-            <p className="text-sm text-gray-500">123 Main Street, Chennai, Tamil Nadu 600001</p>
+      <section className="bg-gray-200">
+        <div className="max-w-full mx-auto ">
+          <div className="grid grid-cols-1  gap-8 items-center">
+            {/* Google Map */}
+            <div className="w-full h-80 lg:h-[400px] rounded-lg overflow-hidden shadow-md">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3930.3304589248146!2d78.13659447484444!3d9.906410890194316!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b00c5eb6b9cb003%3A0x85c376e48c955525!2sAnuppanadi%20Fire%20station!5e0!3m2!1sen!2sin!4v1765716036784!5m2!1sen!2sin"
+                className="w-full h-full border-0"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
           </div>
         </div>
       </section>

@@ -19,7 +19,7 @@ const ProductsPage = () => {
   const [categories, setCategories] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const limit = 4; // products per page
+  const limit = 16; // products per page
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {

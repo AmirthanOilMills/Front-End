@@ -60,7 +60,8 @@ const ProductCard = ({ product, onViewDetails }) => {
     : ["/no-image.png"];
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg hover:scale-105 transition-transform transition-shadow
+  duration-300 ease-out ">
 
       {/* IMAGE SLIDESHOW */}
       <div
@@ -122,9 +123,9 @@ const ProductCard = ({ product, onViewDetails }) => {
           {product.product_name}
         </h3>
 
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+        {/* <p className="text-gray-600 text-sm mb-3 line-clamp-2">
           {product.product_desc}
-        </p>
+        </p> */}
 
         {/* PRICE & CATEGORY */}
         <div className="flex items-center justify-between">

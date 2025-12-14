@@ -119,12 +119,12 @@ const Header = () => {
             </button>
 
             {/* Admin Login */}
-            <button
+            {/* <button
               onClick={() => navigate('/admin')}
               className="p-2 text-gray-600 hover:text-green-800"
             >
               <User className="w-6 h-6" />
-            </button>
+            </button> */}
 
             {/* Mobile Menu Button */}
             <button

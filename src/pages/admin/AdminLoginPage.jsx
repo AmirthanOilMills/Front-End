@@ -120,7 +120,7 @@ const AdminLoginPage = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between mt-6">
+            {/* <div className="flex items-center justify-between mt-6">
               <div className="flex items-center">
                 <input
                   id="remember-me"
@@ -138,7 +138,7 @@ const AdminLoginPage = () => {
                   Forgot password?
                 </a>
               </div>
-            </div>
+            </div> */}
 
             <button
               type="submit"
@@ -156,16 +156,7 @@ const AdminLoginPage = () => {
             >
               ← Back to Store
             </button>
-          </div>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-md">
-            <h3 className="text-sm font-medium text-gray-900 mb-2">Demo Credentials:</h3>
-            <div className="text-xs text-gray-600 space-y-1">
-              <p><strong>Super Admin:</strong> admin@amirthan.com / admin123</p>
-              <p><strong>Normal Admin:</strong> manager@amirthan.com / manager123</p>
-            </div>
-          </div>
+          </div>          
         </div>
       </div>
     </div>
