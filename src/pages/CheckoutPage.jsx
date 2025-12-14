@@ -4,6 +4,7 @@ import useStore from '../helpers/useStore';
 import { useNavigate } from 'react-router-dom';
 import { createCODOrder, createOnlineOrder, verifyPayment } from '../api/public/Order';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL2;
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ const CheckoutPage = () => {
   const cart = useStore((state) => state.cart);
   const clearCart = useStore((state) => state.clearCart);
   const addOrder = useStore((state) => state.addOrder);
-
+  const [invoiceUrl, setInvoiceUrl] = useState(null);
   // State
   const [formData, setFormData] = useState({
     name: '',
@@ -30,7 +31,19 @@ const CheckoutPage = () => {
   // Price calculation
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   const shippingCost = subtotal >= 500 ? 0 : 50;
-  const finalTotal = subtotal + shippingCost;
+  // const finalTotal = subtotal + shippingCost;
+
+  const RAZORPAY_FEE_PERCENT = 2;
+
+  // Razorpay fee only for online payment
+  const Tax =
+    formData.paymentMethod === "online"
+      ? (subtotal + shippingCost) * (RAZORPAY_FEE_PERCENT / 100)
+      : 0;
+
+  const finalTotalWithTax = subtotal + shippingCost + Tax;
+  console.log(finalTotalWithTax);
+  const finalTotal = Math.round(finalTotalWithTax);
 
   // Input change
   const handleInputChange = (e) => {
@@ -68,6 +81,7 @@ const CheckoutPage = () => {
         items: cart,
         subtotal,
         shipping: shippingCost,
+        tax: Tax || 0,
         total: finalTotal,
         paymentMethod: "COD",
       };
@@ -76,6 +90,7 @@ const CheckoutPage = () => {
         const res = await createCODOrder(orderData);
         console.log(res);
         addOrder(res.order.orderId); // Add COD order to store
+        setInvoiceUrl(res.order.invoiceUrl);
         clearCart();
         setOrderPlaced(true);
       } catch (err) {
@@ -102,11 +117,12 @@ const CheckoutPage = () => {
         items: cart,
         subtotal,
         shipping: shippingCost,
+        tax: Tax || 0,
         total: finalTotal,
         paymentMethod: "Online",
       };
 
-      const  data  = await createOnlineOrder(orderPayload);
+      const data = await createOnlineOrder(orderPayload);
       console.log(data);
       const { razorpayOrder, order } = data;
 
@@ -130,7 +146,8 @@ const CheckoutPage = () => {
 
             //  Add verified order to store
             addOrder(verifyRes.order.orderId);
-
+            console.log(verifyRes.order.invoiceUrl);
+            setInvoiceUrl(verifyRes.order.invoiceUrl);
             clearCart();
             setOrderPlaced(true);
           } catch (err) {
@@ -176,18 +193,28 @@ const CheckoutPage = () => {
           </p>
 
           <div className="space-y-3">
-            <button
+            {/* <button
               onClick={() => navigate('/')}
               className="w-full bg-green-800 hover:bg-green-900 text-white font-semibold py-3 rounded-lg"
             >
               Continue Shopping
-            </button>
-
+            </button> */}
+            {/* Invoice */}
+            {invoiceUrl && (
+              <a
+                href={`${BASE_URL}${invoiceUrl}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block px-4 py-2 bg-green-600 text-white font-semibold rounded-md mt-4 hover:bg-green-700 transition"
+              >
+                Download Invoice
+              </a>
+            )}
             <button
               onClick={() => navigate('/products')}
               className="w-full border border-green-800 text-green-800 hover:bg-green-50 font-semibold py-3 rounded-lg"
             >
-              View Products
+              Continue Shopping
             </button>
           </div>
         </div>
@@ -351,6 +378,14 @@ const CheckoutPage = () => {
             <div className="space-y-3 border-t pt-4">
               <div className="flex justify-between"><span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
               <div className="flex justify-between"><span>Shipping</span><span>{shippingCost === 0 ? "Free" : `₹${shippingCost}`}</span></div>
+              {formData.paymentMethod == "online" && (
+                <div className="flex justify-between">
+                  <span>Online Payment Fee (2%)</span>
+                  <span>₹{Tax.toFixed(2)}</span>
+                </div>
+              )}
+
+
               <div className="flex justify-between text-lg font-bold border-t pt-3">
                 <span>Total</span>
                 <span className="text-green-800">₹{finalTotal.toFixed(2)}</span>

@@ -88,7 +88,11 @@ const CategoriesTab = () => {
 
                 <button
                     className="bg-green-800 hover:bg-green-900 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2"
-                    onClick={() => setOpen(true)}
+                    onClick={() => {
+                        setOpen(true)
+                        setEditData(null);
+                    }
+                }
                 >
                     <Plus className="w-4 h-4" />
                     <span>Add Category</span>
@@ -142,7 +146,7 @@ const CategoriesTab = () => {
                                         </button> */}
 
                                         <button className="text-green-600 hover:text-green-900"
-                                        onClick={()=>handleEdit(cat)}>
+                                            onClick={() => handleEdit(cat)}>
                                             <Edit className="w-4 h-4" />
                                         </button>
 
@@ -175,11 +179,11 @@ const CategoriesTab = () => {
             />
             {/* Add Category Modal */}
             <AddCategoryModal
-                    isOpen={open}
-                    onClose={() => setOpen(false)}
-                    onSubmit={handleAddCategory}
-                    initialData={editData}
-                />
+                isOpen={open}
+                onClose={() => setOpen(false)}
+                onSubmit={handleAddCategory}
+                initialData={editData}
+            />
         </div>
     );
 };

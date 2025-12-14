@@ -5,6 +5,8 @@ import { deleteSingleProducts } from "../../api/admin/products";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData }) => {
+    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+    const [categorySearch, setCategorySearch] = useState("");
 
     const [form, setForm] = useState({
         product_name: "",
@@ -66,7 +68,7 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
             setBenefitInput("");
         }
     }, [initialData]);
-    
+
 
 
     const handleChange = (e) => {
@@ -192,22 +194,74 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
                 </div>
 
                 {/* Category */}
-                <div>
+                {/* Category Dropdown */}
+                <div className="relative">
                     <label className="font-medium">Category</label>
-                    <select
-                        name="category_id"
-                        value={form.category_id}
-                        onChange={handleChange}
-                        className="w-full mt-1 border rounded p-2"
+
+                    {/* Selected Value */}
+                    <button
+                        type="button"
+                        className="w-full mt-1 border rounded px-3 py-2 text-left bg-white flex justify-between items-center"
+                        onClick={() => setShowCategoryDropdown((prev) => !prev)}
                     >
-                        <option value="">Select Category</option>
-                        {categories?.map((cat) => (
-                            <option key={cat._id} value={cat._id}>
-                                {cat.category_name}
-                            </option>
-                        ))}
-                    </select>
+                        <span>
+                            {categories?.find((c) => c._id === form.category_id)?.category_name ||
+                                "Select Category"}
+                        </span>
+                        <span className="text-gray-400">▾</span>
+                    </button>
+
+                    {/* Dropdown */}
+                    {showCategoryDropdown && (
+                        <div className="absolute z-50 mt-1 w-full bg-white border rounded-lg shadow-lg">
+                            {/* Search */}
+                            <input
+                                type="text"
+                                placeholder="Search category..."
+                                value={categorySearch}
+                                onChange={(e) => setCategorySearch(e.target.value)}
+                                className="w-full px-3 py-2 border-b outline-none text-sm"
+                            />
+
+                            {/* List */}
+                            <ul className="max-h-48 overflow-y-auto">
+                                {categories
+                                    ?.filter((cat) =>
+                                        cat.category_name
+                                            .toLowerCase()
+                                            .includes(categorySearch.toLowerCase())
+                                    )
+                                    .map((cat) => (
+                                        <li
+                                            key={cat._id}
+                                            onClick={() => {
+                                                setForm((prev) => ({
+                                                    ...prev,
+                                                    category_id: cat._id,
+                                                }));
+                                                setShowCategoryDropdown(false);
+                                                setCategorySearch("");
+                                            }}
+                                            className={`px-4 py-2 cursor-pointer text-sm hover:bg-green-100
+                ${form.category_id === cat._id
+                                                    ? "bg-green-50 font-medium"
+                                                    : ""
+                                                }`}
+                                        >
+                                            {cat.category_name}
+                                        </li>
+                                    ))}
+
+                                {categories?.length === 0 && (
+                                    <li className="px-4 py-2 text-sm text-gray-500">
+                                        No categories found
+                                    </li>
+                                )}
+                            </ul>
+                        </div>
+                    )}
                 </div>
+
 
                 {/* Price */}
                 <div>

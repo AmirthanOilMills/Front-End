@@ -10,7 +10,7 @@ const OrdersTab = () => {
 
   // Pagination
   const [page, setPage] = useState(1);
-  const [limit] = useState(3);
+  const [limit] = useState(6);
   const [totalPages, setTotalPages] = useState(1);
 
   // Popup modal state
@@ -84,7 +84,7 @@ const OrdersTab = () => {
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
-          <option value="">All Status</option>
+          <option value="">Payment Status</option>
           <option value="pending">Pending</option>
           <option value="success">Success</option>
         </select>
@@ -112,7 +112,7 @@ const OrdersTab = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium">Phone</th>
                 <th className="px-6 py-3 text-left text-xs font-medium">Total</th>
                 <th className="px-6 py-3 text-left text-xs font-medium">Method</th>
-                <th className="px-6 py-3 text-left text-xs font-medium">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium">Payment Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium">Order Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium">Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium">Actions</th>
@@ -200,9 +200,8 @@ const OrdersTab = () => {
             <button
               key={i}
               onClick={() => setPage(i + 1)}
-              className={`px-3 py-1 border rounded-md ${
-                page === i + 1 ? "bg-green-600 text-white" : ""
-              }`}
+              className={`px-3 py-1 border rounded-md ${page === i + 1 ? "bg-green-600 text-white" : ""
+                }`}
             >
               {i + 1}
             </button>

@@ -103,9 +103,9 @@ const PaymentTab = () => {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                     Date
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                     Actions
-                                </th>
+                                </th> */}
                             </tr>
                         </thead>
 
@@ -118,7 +118,9 @@ const PaymentTab = () => {
                                         </td>
 
                                         <td className="px-6 py-4 text-sm text-gray-900">
-                                            {payment.orderId?._id || "N/A"}
+                                            {/* {payment.orderId?._id || "N/A"} */}
+                                            {payment?.orderId?.orderId || "N/A"}
+
                                         </td>
 
                                         <td className="px-6 py-4 text-sm">
@@ -147,11 +149,11 @@ const PaymentTab = () => {
                                             {new Date(payment.createdAt).toLocaleString()}
                                         </td>
 
-                                        <td className="px-6 py-4 text-sm">
+                                        {/* <td className="px-6 py-4 text-sm">
                                             <button className="text-blue-600 hover:text-blue-900 flex items-center gap-1">
                                                 <Eye className="w-4 h-4" /> View
                                             </button>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 ))
                             ) : (

@@ -1,21 +1,21 @@
-import { deleteRequest, getRequest, postRequest, putRequest} from "../api"
+import { deleteRequest, getRequest, postRequest, putRequest } from "../api"
 
-export function addProducts(data){
-    return postRequest('/admin/products',data);
+export function addProducts(data) {
+    return postRequest('/admin/products', data);
 }
 
-export function getAllProducts(page="",limit=""){
-    return getRequest(`/admin/products?page=${page}&limit=${limit}`);
+export function getAllProducts(page, limit, search = "", category_id = "") {
+    return getRequest(`/admin/products?page=${page}&limit=${limit}&search=${search}&category_id=${category_id}`);
 }
 
-export function deleteProducts(data){
+export function deleteProducts(data) {
     return deleteRequest(`/admin/products/${data}`);
 }
 
-export function updateProducts(id,data){
-    return putRequest(`/admin/products/${id}`,data)
+export function updateProducts(id, data) {
+    return putRequest(`/admin/products/${id}`, data)
 }
 
-export function deleteSingleProducts(data){
-    return postRequest(`/admin/products/delete`,data)
+export function deleteSingleProducts(data) {
+    return postRequest(`/admin/products/delete`, data)
 }   
