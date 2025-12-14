@@ -61,7 +61,6 @@ const ProductsTab = () => {
           ? ""
           : categories.find((c) => c.category_name === selectedCategory)?._id;
 
-
       const res = await getAllProducts(
         currentPage,
         limit,
@@ -134,123 +133,212 @@ const ProductsTab = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 p-4 md:p-0">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <h2 className="text-2xl font-bold">Products Management</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900">Products Management</h2>
 
         <button
           onClick={() => {
             setEditData(null);
             setOpen(true);
           }}
-          className="bg-green-800 text-white px-4 py-2 rounded flex items-center gap-2"
+          className="bg-green-800 hover:bg-green-900 text-white font-semibold px-4 py-2 rounded-lg flex items-center justify-center gap-2 w-full sm:w-auto transition-colors"
         >
-          <Plus size={16} /> Add Product
+          <Plus size={16} /> 
+          <span>Add Product</span>
         </button>
       </div>
 
       {/* Search + Filter */}
-      <div className="bg-white p-4 rounded shadow flex flex-col lg:flex-row gap-4">
-        {/* Search */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => {
-              setCurrentPage(1);
-              setSearchTerm(e.target.value);
-            }}
-            className="w-full pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:ring-green-600"
-          />
-        </div>
-
-        {/* Category */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="lg:hidden flex items-center gap-2 px-4 py-2 border rounded-md"
-          >
-            <Filter size={16} /> Filters
-          </button>
-
-          <div className={`${showFilters ? "block" : "hidden"} lg:block`}>
-            <CategoryDropdown
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onSelect={(val) => {
+      <div className="bg-white p-4 rounded-lg shadow space-y-4">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => {
                 setCurrentPage(1);
-                setSelectedCategory(val);
+                setSearchTerm(e.target.value);
               }}
+              className="w-full pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:ring-green-600 focus:outline-none"
             />
+          </div>
+
+          {/* Filter Button (Mobile) + Category Dropdown */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="lg:hidden flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors"
+            >
+              <Filter size={16} /> 
+              <span>Filters</span>
+            </button>
+
+            <div className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-auto`}>
+              <CategoryDropdown
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onSelect={(val) => {
+                  setCurrentPage(1);
+                  setSelectedCategory(val);
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white shadow rounded overflow-hidden">
-        <table className="min-w-full">
-          <thead className="bg-gray-100 text-gray-600 text-sm uppercase">
-            <tr>
-              <th className="px-6 py-3 text-left">Image</th>
-              <th className="px-6 py-3 text-left">Name</th>
-              <th className="px-6 py-3 text-left">Category</th>
-              <th className="px-6 py-3 text-left">Price</th>
-              <th className="px-6 py-3 text-left">Actions</th>
-            </tr>
-          </thead>
+      {/* Mobile View - Card Layout */}
+      <div className="block md:hidden space-y-4">
+        {loading ? (
+          <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
+            Loading...
+          </div>
+        ) : products.length === 0 ? (
+          <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
+            No products found.
+          </div>
+        ) : (
+          products.map((p) => (
+            <div key={p._id} className="bg-white rounded-lg shadow overflow-hidden">
+              {/* Product Image */}
+              <div className="relative h-48 bg-gray-100">
+                <img
+                  src={`${BASE_URL}${p.images?.[0]}`}
+                  alt={p.product_name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
-          <tbody className="divide-y">
-            {loading ? (
-              <tr>
-                <td colSpan="5" className="text-center py-4">
-                  Loading...
-                </td>
-              </tr>
-            ) : products.length ? (
-              products.map((p) => (
-                <tr key={p._id}>
-                  <td className="px-6 py-3">
-                    <img
-                      src={`${BASE_URL}${p.images?.[0]}`}
-                      className="h-12 w-12 object-cover rounded"
-                    />
-                  </td>
-                  <td className="px-6 py-3">{p.product_name}</td>
-                  <td className="px-6 py-3">
+              {/* Product Details */}
+              <div className="p-4 space-y-3">
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-base">
+                    {p.product_name}
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
                     {p.category_id?.category_name}
-                  </td>
-                  <td className="px-6 py-3">₹{p.price}</td>
-                  <td className="px-6 py-3 space-x-3">
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <span className="text-lg font-bold text-green-700">
+                    ₹{p.price}
+                  </span>
+
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => {
                         setEditData(p);
                         setOpen(true);
                       }}
-                      className="text-green-700"
+                      className="p-2 text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
+                      title="Edit"
                     >
                       <Edit size={18} />
                     </button>
                     <button
                       onClick={() => handleDelete(p._id)}
-                      className="text-red-700"
+                      className="p-2 text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                      title="Delete"
                     >
                       <Trash2 size={18} />
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Tablet & Desktop View - Table Layout */}
+      <div className="hidden md:block bg-white shadow rounded-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Image
+                </th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Category
+                </th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Price
+                </th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+
+            <tbody className="bg-white divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="px-4 lg:px-6 py-8 text-center text-gray-500">
+                    Loading...
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="text-center py-4 text-gray-500">
-                  No products found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ) : products.length ? (
+                products.map((p) => (
+                  <tr key={p._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 lg:px-6 py-4">
+                      <img
+                        src={`${BASE_URL}${p.images?.[0]}`}
+                        alt={p.product_name}
+                        className="h-12 w-12 object-cover rounded"
+                      />
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 text-sm font-medium text-gray-900">
+                      {p.product_name}
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 text-sm text-gray-700">
+                      {p.category_id?.category_name}
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 text-sm font-semibold text-green-700">
+                      ₹{p.price}
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 text-sm font-medium">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setEditData(p);
+                            setOpen(true);
+                          }}
+                          className="text-green-700 hover:text-green-900 p-1 hover:bg-green-50 rounded transition-colors"
+                          title="Edit"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(p._id)}
+                          className="text-red-700 hover:text-red-900 p-1 hover:bg-red-50 rounded transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="px-4 lg:px-6 py-8 text-center text-gray-500">
+                    No products found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Pagination */}
