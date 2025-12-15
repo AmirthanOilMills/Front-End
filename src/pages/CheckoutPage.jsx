@@ -4,7 +4,7 @@ import useStore from '../helpers/useStore';
 import { useNavigate } from 'react-router-dom';
 import { createCODOrder, createOnlineOrder, verifyPayment } from '../api/public/Order';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL2;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
