@@ -14,16 +14,16 @@ const api = axios.create({
 // ===== INTERCEPTORS =====
 
 // Request interceptor — adds token to every request
-api.interceptors.request.use(
-  (config) => {
-    const token = Cookies.get("token"); // your cookie name
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// api.interceptors.request.use(
+//   (config) => {
+//     const token = Cookies.get("token"); // your cookie name
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
 
 // Response interceptor — can handle global errors or token expiry
 api.interceptors.response.use(

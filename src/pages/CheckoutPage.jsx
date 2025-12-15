@@ -205,7 +205,7 @@ const CheckoutPage = () => {
             {/* Invoice */}
             {invoiceUrl && (
               <a
-                href={`${BASE_URL}${invoiceUrl}`}
+                href={`${BASE_URL}/${invoiceUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block px-4 py-2 bg-green-600 text-white font-semibold rounded-md mt-4 hover:bg-green-700 transition"
