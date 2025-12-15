@@ -12,7 +12,6 @@ export function getAllOrders(
   if (search) query += `&search=${search}`;
   if (paymentMethod) query += `&paymentMethod=${paymentMethod}`;
   if (status) query += `&status=${status}`;
-  console.log(query);
   return getRequest(query);
 }
 
@@ -28,7 +27,6 @@ export function getAllPayments(
   if (status) query += `&status=${status}`;
   if (search) query += `&search=${search}`;
 
-  console.log("Fetching payments:", query);
 
   return getRequest(query);
 }

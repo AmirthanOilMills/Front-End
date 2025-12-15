@@ -18,7 +18,6 @@ const PaymentTab = () => {
     const fetchPayments = async () => {
         try {
             const res = await getAllPayments(page, limit, status, search);
-            console.log(res);
             setPayments(res.payments);
             setTotalPages(res.totalPages);
         } catch (error) {

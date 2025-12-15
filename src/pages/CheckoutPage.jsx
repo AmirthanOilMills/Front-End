@@ -42,7 +42,6 @@ const CheckoutPage = () => {
       : 0;
 
   const finalTotalWithTax = subtotal + shippingCost + Tax;
-  console.log(finalTotalWithTax);
   const finalTotal = Math.round(finalTotalWithTax);
 
   // Input change
@@ -88,7 +87,6 @@ const CheckoutPage = () => {
 
       try {
         const res = await createCODOrder(orderData);
-        console.log(res);
         addOrder(res.order.orderId); // Add COD order to store
         setInvoiceUrl(res.order.invoiceUrl);
         clearCart();
@@ -106,6 +104,13 @@ const CheckoutPage = () => {
     // (B) Online Payment via Razorpay
     // -----------------------------
     try {
+
+      if (!window.Razorpay) {
+        alert("Payment gateway is loading. Please try again in a moment.");
+        setIsSubmitting(false);
+        return;
+      }
+
       const orderPayload = {
         userName: formData.name,
         phone: formData.phone,
@@ -123,7 +128,6 @@ const CheckoutPage = () => {
       };
 
       const data = await createOnlineOrder(orderPayload);
-      console.log(data);
       const { razorpayOrder, order } = data;
 
       if (!razorpayOrder) throw new Error("Razorpay order not created");
@@ -146,7 +150,6 @@ const CheckoutPage = () => {
 
             //  Add verified order to store
             addOrder(verifyRes.order.orderId);
-            console.log(verifyRes.order.invoiceUrl);
             setInvoiceUrl(verifyRes.order.invoiceUrl);
             clearCart();
             setOrderPlaced(true);
