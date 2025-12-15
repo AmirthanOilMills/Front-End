@@ -47,70 +47,111 @@ const CartPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* CART ITEMS */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* CART ITEMS */}
+          <div className="lg:col-span-2 space-y-4">
             {cart.map((item) => (
               <div
                 key={item._id}
-                className="bg-white rounded-lg shadow-md p-6 flex items-center justify-between"
+                className="bg-white rounded-xl shadow-sm border p-4 sm:p-6"
               >
-                {/* PRODUCT IMAGE */}
-                <img
-                  src={`${import.meta.env.VITE_BASE_URL}${item.images?.[0] || "/no-image.png"}`}
-                  alt={item.product_name}
-                  className="w-24 h-24 object-cover rounded-lg"
-                />
+                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6 gap-4">
 
-                {/* PRODUCT DETAILS */}
-                <div className="flex-1 ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{item.product_name}</h3>
-                  <p className="text-sm text-gray-500">
-                    {item?.category_id?.category_name || "Unknown Category"}
-                  </p>
-                  <p className="text-lg font-bold text-green-800 mt-2">₹{item.price}</p>
-                </div>
-
-                {/* QUANTITY CONTROLS */}
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="flex items-center border border-gray-300 rounded-md">
-                    <button
-                      onClick={() => updateQty(item._id, Math.max(1, item.qty - 1))}
-                      className="p-2 hover:bg-gray-100 transition-colors"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="px-4 py-2 border-x border-gray-300 min-w-[40px] text-center">
-                      {item.qty}
-                    </span>
-                    <button
-                      onClick={() => updateQty(item._id, item.qty + 1)}
-                      className="p-2 hover:bg-gray-100 transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                  {/* PRODUCT IMAGE */}
+                  <div className="flex-shrink-0 mx-auto sm:mx-0">
+                    <img
+                      src={`${import.meta.env.VITE_BASE_URL}${item.images?.[0] || "/no-image.png"}`}
+                      alt={item.product_name}
+                      className="w-28 h-28 object-cover rounded-lg border"
+                    />
                   </div>
-                  <button
-                    onClick={() => removeFromCart(item._id)}
-                    className="text-red-600 hover:text-red-800 text-sm"
-                  >
-                    Remove
-                  </button>
-                </div>
 
-                {/* ITEM TOTAL */}
-                <div className="text-right font-bold text-gray-900">
-                  ₹{(item.price * item.qty).toFixed(2)}
+                  {/* PRODUCT DETAILS */}
+                  <div className="flex-1 text-center sm:text-left">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {item.product_name}
+                    </h3>
+
+                    <p className="text-sm text-gray-500 mt-1">
+                      Category:{" "}
+                      <span className="font-medium text-gray-700">
+                        {item?.category_id?.category_name || "Unknown Category"}
+                      </span>
+                    </p>
+
+                    <p className="mt-3 text-sm text-gray-500">Price</p>
+                    <p className="text-lg font-bold text-green-800">
+                      ₹{item.price}
+                    </p>
+                  </div>
+
+                  {/* QUANTITY + ACTIONS */}
+                  <div className="flex flex-col items-center gap-3">
+                    <p className="text-sm text-gray-500">Quantity</p>
+
+                    <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                      <button
+                        onClick={() => updateQty(item._id, Math.max(1, item.qty - 1))}
+                        className="p-2 hover:bg-gray-100 transition"
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+
+                      <span className="px-4 py-2 min-w-[44px] text-center text-sm font-medium">
+                        {item.qty}
+                      </span>
+
+                      <button
+                        onClick={() => updateQty(item._id, item.qty + 1)}
+                        className="p-2 hover:bg-gray-100 transition"
+                        aria-label="Increase quantity"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={() => removeFromCart(item._id)}
+                      className="
+                      inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 text-sm font-medium text-white rounded-lg cursor-pointer hover:bg-red-500 hover:text-white
+                      transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+                    >
+                      Remove
+                    </button>
+
+                  </div>
+
+                  {/* ITEM TOTAL */}
+                  <div className="text-center sm:text-right mt-2 sm:mt-0">
+                    <p className="text-sm text-gray-500">Item Total</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      ₹{(item.price * item.qty).toFixed(2)}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
 
-            {/* CONTINUE SHOPPING BUTTON */}
+            {/* CONTINUE SHOPPING */}
             <button
               onClick={() => navigate("/products")}
-              className="text-green-800 hover:text-green-900 font-medium flex items-center mt-4"
+              className="
+    mt-8 inline-flex items-center gap-2
+    px-6 py-3
+    rounded-xl
+    border border-green-700
+    text-green-800 font-semibold
+    hover:bg-green-50
+    transition-all duration-200
+    active:scale-95
+  "
             >
               Continue Shopping
+              <ArrowRight className="w-5 h-5" />
             </button>
+
           </div>
+
 
           {/* ORDER SUMMARY */}
           <div className="lg:col-span-1">
