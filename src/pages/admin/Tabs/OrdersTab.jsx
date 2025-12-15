@@ -24,7 +24,6 @@ const OrdersTab = () => {
   const fetchOrders = async () => {
     try {
       const res = await getAllOrders(page, limit, search, filterMethod, filterStatus);
-      console.log(res);
       setOrders(res.orders || []);
       setTotalPages(res.totalPages || 1);
     } catch (err) {
@@ -35,7 +34,6 @@ const OrdersTab = () => {
   const handleStatusChange = async (id, newStatus) => {
     try {
       const res = await updateStatus(id, newStatus);
-      console.log(res);
       fetchOrders();
     } catch (err) {
       console.error("Failed to update order status:", err);

@@ -31,7 +31,6 @@ const AdminLoginPage = () => {
 
     try {
       const res = await login(formData);
-      console.log(res);
 
       if (res?.status) {
         setLogin(res.user);
