@@ -4,7 +4,7 @@ import useStore from '../helpers/useStore';
 import { useNavigate } from 'react-router-dom';
 import { createCODOrder, createOnlineOrder, verifyPayment } from '../api/public/Order';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL2;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -205,7 +205,7 @@ const CheckoutPage = () => {
             {/* Invoice */}
             {invoiceUrl && (
               <a
-                href={`${BASE_URL}${invoiceUrl}`}
+                href={`${BASE_URL}/${invoiceUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block px-4 py-2 bg-green-600 text-white font-semibold rounded-md mt-4 hover:bg-green-700 transition"

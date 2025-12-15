@@ -1,6 +1,5 @@
 // src/utils/api.js
 import axios from "axios";
-import Cookies from "js-cookie";
 
 // Base URL of your backend API
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -14,16 +13,16 @@ const api = axios.create({
 // ===== INTERCEPTORS =====
 
 // Request interceptor — adds token to every request
-api.interceptors.request.use(
-  (config) => {
-    const token = Cookies.get("token"); // your cookie name
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// api.interceptors.request.use(
+//   (config) => {
+//     const token = Cookies.get("token"); // your cookie name
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
 
 // Response interceptor — can handle global errors or token expiry
 api.interceptors.response.use(

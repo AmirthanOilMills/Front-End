@@ -13,7 +13,7 @@ const statusColors = {
 };
 
 const OrderPage = () => {
-  const storeOrderIds = useStore((state) => state.orders); // stored orderIds
+  // const storeOrderIds = useStore((state) => state.orders); // stored orderIds
 
   const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
@@ -22,11 +22,11 @@ const OrderPage = () => {
   const [error, setError] = useState("");
 
   // 👉 Initial load: fetch all orders using store IDs
-  useEffect(() => {
-    if (storeOrderIds?.length > 0) {
-      fetchOrders(storeOrderIds);
-    }
-  }, [storeOrderIds]);
+  // useEffect(() => {
+  //   if (storeOrderIds?.length > 0) {
+  //     fetchOrders(storeOrderIds);
+  //   }
+  // }, [storeOrderIds]);
 
   // ================= API CALL =================
   const fetchOrders = async (orderIds) => {
@@ -57,7 +57,7 @@ const OrderPage = () => {
     }
 
     // 🔹 If search has value → send only that ID
-    fetchOrders([search.trim()]);
+    fetchOrders([search.trim().toLowerCase()]);
   };
 
   const toggleExpand = (orderId) => {
@@ -66,13 +66,13 @@ const OrderPage = () => {
 
   return (
     <div className="max-w-5xl mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900">My Orders</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900">Order Tracking</h1>
 
       {/* ================= SEARCH ================= */}
       <div className="mb-6 flex flex-col md:flex-row gap-3">
         <input
           type="text"
-          placeholder="Enter Order ID"
+          placeholder="Enter you Order ID to track status..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full md:w-1/2 px-4 py-2 border rounded-md focus:ring-2 focus:ring-green-500 focus:outline-none"

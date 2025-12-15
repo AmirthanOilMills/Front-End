@@ -17,7 +17,7 @@ const Header = () => {
   // const cartCount = cart.reduce((total, item) => total + item.qty, 0);
   const cartCount = cart.length;
   const wishlistCount = wishlist.length;
-  const ordersCount = orders.length; 
+  // const ordersCount = orders.length; 
 
   // Navigation items
   const navigation = [
@@ -112,11 +112,11 @@ const Header = () => {
               className="p-2 text-gray-600 hover:text-green-800 relative"
             >
               <Truck   className="w-6 h-6" />
-              {ordersCount > 0 && (
+              {/* {ordersCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
                   {ordersCount}
                 </span>
-              )}
+              )} */}
             </button>
 
             {/* Admin Login */}
