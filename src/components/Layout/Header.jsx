@@ -14,7 +14,8 @@ const Header = () => {
   const orders = useStore((state) => state.orders);
 
   // Count functions
-  const cartCount = cart.reduce((total, item) => total + item.qty, 0);
+  // const cartCount = cart.reduce((total, item) => total + item.qty, 0);
+  const cartCount = cart.length;
   const wishlistCount = wishlist.length;
   const ordersCount = orders.length; 
 
