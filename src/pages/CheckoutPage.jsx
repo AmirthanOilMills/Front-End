@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle } from 'lucide-react';
 import useStore from '../helpers/useStore';
 import { useNavigate } from 'react-router-dom';
-import { createCODOrder, createOnlineOrder, verifyPayment } from '../api/public/Order';
+import { createCODOrder, createRazorpayOrder, verifyPayment } from '../api/public/Order';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -13,6 +13,8 @@ const CheckoutPage = () => {
   const clearCart = useStore((state) => state.clearCart);
   const addOrder = useStore((state) => state.addOrder);
   const [invoiceUrl, setInvoiceUrl] = useState(null);
+  const [errors, setErrors] = useState({});
+
   // State
   const [formData, setFormData] = useState({
     name: '',
@@ -45,14 +47,90 @@ const CheckoutPage = () => {
   const finalTotal = Math.round(finalTotalWithTax);
 
   // Input change
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  setFormData(prev => ({ ...prev, [name]: value }));
+
+  // validate while typing
+  setErrors(prev => {
+    const newErr = { ...prev };
+
+    switch (name) {
+      case "name":
+        value.trim() ? delete newErr.name : newErr.name = "Name is required";
+        break;
+
+      case "email":
+        if (!value.trim()) delete newErr.email;
+        else {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          emailRegex.test(value)
+            ? delete newErr.email
+            : newErr.email = "Invalid email";
+        }
+        break;
+
+      case "phone":
+        /^[0-9]{10}$/.test(value)
+          ? delete newErr.phone
+          : newErr.phone = "Phone must be 10 digits";
+        break;
+
+      case "address":
+        value.trim()
+          ? delete newErr.address
+          : newErr.address = "Address required";
+        break;
+
+      case "city":
+        value.trim()
+          ? delete newErr.city
+          : newErr.city = "City required";
+        break;
+
+      case "state":
+        value.trim()
+          ? delete newErr.state
+          : newErr.state = "State required";
+        break;
+
+      case "pincode":
+        /^[0-9]{6}$/.test(value)
+          ? delete newErr.pincode
+          : newErr.pincode = "PIN must be 6 digits";
+        break;
+
+      default:
+        break;
+    }
+
+    return newErr;
+  });
+};
+
+
+ const validateBeforeSubmit = () => {
+  return Object.keys(errors).length === 0 &&
+  formData.name.trim() &&
+  formData.phone.trim() &&
+  formData.address.trim() &&
+  formData.city.trim() &&
+  formData.state.trim() &&
+  formData.pincode.trim();
+};
+
+
   // -----------------------------
   // Submit Checkout
   // -----------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+  if (!validateBeforeSubmit()) {
+  alert("Please fix form errors.");
+  return;
+}
 
     if (cart.length === 0) {
       alert("Your cart is empty!");
@@ -87,13 +165,13 @@ const CheckoutPage = () => {
 
       try {
         const res = await createCODOrder(orderData);
-        addOrder(res.order.orderId); // Add COD order to store
+        addOrder(res.order.orderId);
         setInvoiceUrl(res.order.invoiceUrl);
         clearCart();
         setOrderPlaced(true);
       } catch (err) {
         console.error("COD Order Error:", err);
-        alert("Failed to place COD order.");
+        alert("Failed to place COD order. Please try again.");
       } finally {
         setIsSubmitting(false);
       }
@@ -104,34 +182,22 @@ const CheckoutPage = () => {
     // (B) Online Payment via Razorpay
     // -----------------------------
     try {
-
       if (!window.Razorpay) {
         alert("Payment gateway is loading. Please try again in a moment.");
         setIsSubmitting(false);
         return;
       }
 
-      const orderPayload = {
-        userName: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        pincode: formData.pincode,
-        items: cart,
-        subtotal,
-        shipping: shippingCost,
-        tax: Tax || 0,
+      // Step 1: Create Razorpay Order
+      const { razorpayOrder } = await createRazorpayOrder({
         total: finalTotal,
-        paymentMethod: "Online",
-      };
+      });
 
-      const data = await createOnlineOrder(orderPayload);
-      const { razorpayOrder, order } = data;
+      if (!razorpayOrder) {
+        throw new Error("Razorpay order not created");
+      }
 
-      if (!razorpayOrder) throw new Error("Razorpay order not created");
-
+      // Step 2: Configure Razorpay Options
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: razorpayOrder.amount.toString(),
@@ -139,49 +205,86 @@ const CheckoutPage = () => {
         name: "Amirthan Oil",
         description: "Order Payment",
         order_id: razorpayOrder.id,
+
+        // Step 3: Payment Success Handler
         handler: async (response) => {
           try {
             // Verify payment on backend
             const verifyRes = await verifyPayment({
+              userName: formData.name,
+              phone: formData.phone,
+              email: formData.email,
+              address: formData.address,
+              city: formData.city,
+              state: formData.state,
+              pincode: formData.pincode,
+              items: cart,
+              subtotal,
+              shipping: shippingCost,
+              tax: Tax || 0,
+              total: finalTotal,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             });
 
-            //  Add verified order to store
-            addOrder(verifyRes.order.orderId);
-            setInvoiceUrl(verifyRes.order.invoiceUrl);
-            clearCart();
-            setOrderPlaced(true);
+            if (verifyRes.success) {
+              // Order created successfully after payment verification
+              addOrder(verifyRes.order.orderId);
+              setInvoiceUrl(verifyRes.order.invoiceUrl);
+              clearCart();
+              setOrderPlaced(true);
+            } else {
+              alert("Payment verification failed. Please contact support.");
+            }
           } catch (err) {
             console.error("Payment verification failed:", err);
-            alert("Payment verification failed.");
+            alert("Payment verification failed. Please contact support with your payment ID: " + response.razorpay_payment_id);
+          } finally {
+            setIsSubmitting(false);
           }
         },
+
         prefill: {
           name: formData.name,
           email: formData.email || "customer@example.com",
           contact: formData.phone,
         },
-        theme: { color: "#0E9F6E" },
+
+        theme: {
+          color: "#65a30d"
+        },
+
+        // Step 4: Handle Modal Dismissal (user closes without paying)
+        modal: {
+          ondismiss: function () {
+            setIsSubmitting(false);
+            alert("Payment cancelled. Your order was not placed.");
+          }
+        }
       };
 
+      // Step 5: Open Razorpay Modal
       const rzp = new window.Razorpay(options);
+
+      // Handle payment failure
+      rzp.on("payment.failed", function (response) {
+        console.error("Payment failed:", response.error);
+        alert(`Payment failed: ${response.error.description}`);
+        setIsSubmitting(false);
+      });
+
       rzp.open();
 
-      rzp.on("payment.failed", (resp) => {
-        console.error("Payment failed:", resp.error);
-        alert("Payment failed. Please try again.");
-      });
+      // DON'T set setIsSubmitting(false) here!
+      // It will be handled in handler, ondismiss, or payment.failed
 
     } catch (err) {
       console.error("Razorpay Checkout Error:", err);
-      alert("Something went wrong during online payment.");
-    } finally {
+      alert("Something went wrong. Please try again.");
       setIsSubmitting(false);
     }
   };
-
   // -----------------------------
   // Order Success Screen
   // -----------------------------
@@ -252,11 +355,12 @@ const CheckoutPage = () => {
                 <input
                   type="text"
                   name="name"
-                  required
+                  
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-md"
+                  className={`w-full px-3 py-2 border rounded-md ${errors.name ? "border-red-500" : ""}`}
                 />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
 
               <div className="mb-6">
@@ -266,8 +370,9 @@ const CheckoutPage = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-md"
+                  className={`w-full px-3 py-2 border rounded-md ${errors.email ? "border-red-500" : ""}`}
                 />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
 
               <div className="mb-6">
@@ -275,22 +380,24 @@ const CheckoutPage = () => {
                 <input
                   type="tel"
                   name="phone"
-                  required
+                  
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-md"
+                  className={`w-full px-3 py-2 border rounded-md ${errors.phone ? "border-red-500" : ""}`}
                 />
+                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
               </div>
 
               <div className="mb-6">
                 <label className="block mb-2">Address *</label>
                 <textarea
                   name="address"
-                  required
+                  
                   value={formData.address}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-md"
+                  className={`w-full px-3 py-2 border rounded-md ${errors.address ? "border-red-500" : ""}`}
                 />
+                {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
               </div>
 
               <div className="grid grid-cols-3 gap-4 mb-6">
@@ -298,30 +405,33 @@ const CheckoutPage = () => {
                   type="text"
                   name="city"
                   placeholder="City *"
-                  required
+                  
                   value={formData.city}
                   onChange={handleInputChange}
-                  className="px-3 py-2 border rounded-md"
+                  className={`px-3 py-2 border rounded-md ${errors.city ? "border-red-500" : ""}`}
                 />
+                {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
                 <input
                   type="text"
                   name="state"
                   placeholder="State *"
-                  required
+                  
                   value={formData.state}
                   onChange={handleInputChange}
-                  className="px-3 py-2 border rounded-md"
+                  className={`px-3 py-2 border rounded-md ${errors.state ? "border-red-500" : ""}`}
                 />
+                {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
                 <input
                   type="text"
                   name="pincode"
                   placeholder="PIN *"
                   pattern="[0-9]{6}"
-                  required
+                  
                   value={formData.pincode}
                   onChange={handleInputChange}
-                  className="px-3 py-2 border rounded-md"
+                  className={`px-3 py-2 border rounded-md ${errors.pincode ? "border-red-500" : ""}`}
                 />
+                {errors.pincode && <p className="text-red-500 text-sm mt-1">{errors.pincode}</p>}
               </div>
 
               {/* Payment Method */}

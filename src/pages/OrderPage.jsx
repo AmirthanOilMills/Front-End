@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import useStore from "../helpers/useStore";
 import { getOrderbyOrderId } from "../api/public/Order";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL2;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const statusColors = {
   Pending: "bg-yellow-100 text-yellow-800",
@@ -193,7 +193,7 @@ const OrderPage = () => {
                   {/* Invoice */}
                   {order.invoiceUrl && (
                     <a
-                      href={`${BASE_URL}${order.invoiceUrl}`}
+                      href={`${BASE_URL}/${order.invoiceUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-block px-4 py-2 bg-green-600 text-white font-semibold rounded-md mt-4 hover:bg-green-700 transition"

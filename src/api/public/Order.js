@@ -63,8 +63,8 @@ export function createCODOrder(orderData) {
 }
 
 // Create Online Order (Razorpay)
-export function createOnlineOrder(orderPayload) {
-  return postRequest(`/order/create-order`, orderPayload);
+export function createRazorpayOrder(total) {
+  return postRequest(`/order/create-online-order`, total);
 }
 
 // Verify Payment
