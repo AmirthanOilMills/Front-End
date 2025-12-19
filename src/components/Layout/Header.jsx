@@ -38,11 +38,11 @@ const Header = () => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
                 <Phone className="w-4 h-4 mr-2" />
-                <span>+91 98765 43210</span>
+                <span>+91 80150 79866</span>
               </div>
             </div>
             <div className="hidden md:block">
-              <span>Free delivery on orders above ₹500</span>
+              {/* <span>Free delivery on orders above ₹500</span> */}
             </div>
           </div>
         </div>
@@ -56,13 +56,13 @@ const Header = () => {
             className="flex-shrink-0 cursor-pointer"
             onClick={() => navigate('/')}
           >
-            <h1 className="sm:text-2xl font-bold text-green-800 text-xl">
-              Amirthan <span className="text-yellow-500">Oil Mills</span>
+            <h1 className="lg:text-2xl font-extrabold text-green-800 sm:text-xl text-[14px]">
+              அமிர்தன் <span className="text-yellow-500">ஆயில் மில்ஸ்</span>
             </h1>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-2 lg:space-x-8">
             {navigation.map((item) => (
               <button
                 key={item.path}
@@ -82,9 +82,9 @@ const Header = () => {
             {/* Wishlist */}
             <button
               onClick={() => navigate('/wishlist')}
-              className="p-2 text-gray-600 hover:text-green-800 relative"
+              className="p-1 sm:p-2 text-gray-600 hover:text-green-800 relative"
             >
-              <Heart className="w-6 h-6" />
+              <Heart className="sm:w-6 sm:h-6 w-5 h-5" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
                   {wishlistCount}
@@ -95,9 +95,9 @@ const Header = () => {
             {/* Cart */}
             <button
               onClick={() => navigate('/cart')}
-              className="p-2 text-gray-600 hover:text-green-800 relative"
+              className="p-1 sm:p-2 text-gray-600 hover:text-green-800 relative"
             >
-              <ShoppingCart className="w-6 h-6" />
+              <ShoppingCart className="sm:w-6 sm:h-6 w-5 h-5" />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
                   {cartCount}
@@ -109,9 +109,9 @@ const Header = () => {
             {/* Cart */}
             <button
               onClick={() => navigate('/orders')}
-              className="p-2 text-gray-600 hover:text-green-800 relative"
+              className="p-1 sm:p-2 text-gray-600 hover:text-green-800 relative"
             >
-              <Truck   className="w-6 h-6" />
+              <Truck   className="sm:w-6 sm:h-6 w-5 h-5" />
               {/* {ordersCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
                   {ordersCount}
@@ -130,9 +130,9 @@ const Header = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-gray-600"
+              className="md:hidden p-1 sm:p-2 text-gray-600"
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="sm:w-6 sm:h-6 w-5 h-5" /> : <Menu className="sm:w-6 sm:h-6 w-5 h-5" />}
             </button>
           </div>
         </div>

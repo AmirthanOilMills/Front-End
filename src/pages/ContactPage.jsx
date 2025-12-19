@@ -92,7 +92,7 @@ const ContactPage = () => {
   };
 
   const handleWhatsAppClick = () => {
-    const phoneNumber = "+919876543210";
+    const phoneNumber = "+918015079866";
     const message = "Hi! I have a question about your oils.";
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
@@ -133,11 +133,8 @@ const ContactPage = () => {
                     Our Location
                   </h3>
                   <p className="text-gray-600">
-                    123 Main Street
-                    <br />
-                    Chennai, Tamil Nadu 600001
-                    <br />
-                    India
+                    RS No. 198, Plot No. 1a,Tnhb, Colony Mela, Anuppanadi Fire
+                    Station, Madurai- 625009, Tamil Nadu, India
                   </p>
                 </div>
               </div>
@@ -150,11 +147,7 @@ const ContactPage = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-1">
                     Phone Numbers
                   </h3>
-                  <p className="text-gray-600">
-                    Primary: +91 98765 43210
-                    <br />
-                    Alternate: +91 98765 43211
-                  </p>
+                  <p className="text-gray-600">+91 80150 79866</p>
                 </div>
               </div>
 
@@ -166,13 +159,7 @@ const ContactPage = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-1">
                     Email Address
                   </h3>
-                  <p className="text-gray-600">
-                    General: info@amirthanoils.com
-                    <br />
-                    Orders: orders@amirthanoils.com
-                    <br />
-                    Support: support@amirthanoils.com
-                  </p>
+                  <p className="text-gray-600">amirthanoilmills@gmail.com</p>
                 </div>
               </div>
 

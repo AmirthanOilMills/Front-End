@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-
+@theme {
+  --breakpoint-xs: ;
+}
 @keyframes fadeIn {
   from {
     opacity: 0;

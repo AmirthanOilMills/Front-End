@@ -19,7 +19,7 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <h3 className="text-xl font-bold mb-4">
-              Amirthan <span className="text-yellow-400">Oil Mills</span>
+              அமிர்தன் <span className="text-yellow-500">ஆயில் மில்ஸ்</span>
             </h3>
             <p className="text-green-100 mb-4">
               Pure Quality Oils for Every Home & Kitchen. Traditional methods,
@@ -139,15 +139,15 @@ const Footer = () => {
               </div>
               <div className="flex items-center">
                 <Phone className="w-5 h-5 mr-3 text-yellow-400" />
-                <span className="text-green-100">+91 98765 43210</span>
+                <span className="text-green-100">+91 80150 79866</span>
               </div>
 
               <div className="flex items-center">
                 <Mail className="w-5 h-5 mr-3 text-yellow-400" />
-                <span className="text-green-100">info@amirthanoils.com</span>
+                <span className="text-green-100">amirthanoilmills@gmail.com</span>
               </div>
               <div className="flex items-center">
-                <span className="text-green-100">GST No.33DRJPK3594Q1ZZ</span>
+                <span className="text-green-100">GST No. 33DRJPK3594Q1ZZ</span>
               </div>
             </div>
           </div>
