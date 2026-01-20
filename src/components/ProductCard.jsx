@@ -70,7 +70,7 @@ const ProductCard = ({ product, onViewDetails }) => {
         onMouseLeave={() => setIsHovered(false)}
       >
         <img
-          src={`${import.meta.env.VITE_BASE_URL}${images[currentIndex]}`}
+          src={images[currentIndex].url}
           alt={product.product_name}
           className="w-full h-full object-cover transition-all duration-500"
         />
@@ -80,9 +80,8 @@ const ProductCard = ({ product, onViewDetails }) => {
           {images.map((_, idx) => (
             <div
               key={idx}
-              className={`w-2 h-2 rounded-full transition-all ${
-                currentIndex === idx ? "bg-white" : "bg-white/50"
-              }`}
+              className={`w-2 h-2 rounded-full transition-all ${currentIndex === idx ? "bg-white" : "bg-white/50"
+                }`}
             ></div>
           ))}
         </div>
@@ -102,11 +101,10 @@ const ProductCard = ({ product, onViewDetails }) => {
             {/* WISHLIST BUTTON */}
             <button
               onClick={handleWishlistClick}
-              className={`p-2 rounded-full transition-colors ${
-                wishlistActive
+              className={`p-2 rounded-full transition-colors ${wishlistActive
                   ? "bg-red-100 text-red-600"
                   : "bg-white hover:bg-red-50 text-gray-600"
-              }`}
+                }`}
             >
               <Heart
                 className={`w-5 h-5 ${wishlistActive ? "fill-current" : ""}`}
@@ -142,11 +140,10 @@ const ProductCard = ({ product, onViewDetails }) => {
         <button
           onClick={() => addToCart(product)}
           disabled={!product.stock}
-          className={`w-full mt-4 py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center space-x-2 ${
-            product.stock
-              ? "bg-green-800 hover:bg-green-900 text-white"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
+          className={`w-full mt-4 py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center space-x-2 ${product.stock
+            ? "bg-green-800 hover:bg-green-900 text-white"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
         >
           <ShoppingCart className="w-4 h-4" />
           <span>{product.stock ? "Add to Cart" : "Out of Stock"}</span>

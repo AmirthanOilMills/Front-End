@@ -55,7 +55,7 @@ const WishlistPage = () => {
               {/* PRODUCT IMAGE */}
               <div className="relative">
                 <img
-                  src={`${import.meta.env.VITE_BASE_URL}${product.images?.[0] || '/no-image.png'}`}
+                  src={product.images?.[0]?.url || "/no-image.png"}
                   alt={product.product_name}
                   className="w-full h-48 object-cover"
                 />

@@ -81,7 +81,7 @@ const ProductDetailPage = () => {
               onMouseLeave={() => setIsHovered(false)}
             >
               <img
-                src={`${import.meta.env.VITE_BASE_URL}${product.images[currentIndex]}`}
+                src={product.images[currentIndex].url}
                 alt={product.product_name}
                 className="w-full h-full object-cover"
               />
@@ -164,11 +164,10 @@ const ProductDetailPage = () => {
 
                 <button
                   onClick={handleWishlistClick}
-                  className={`px-6 py-3 rounded-lg border-2 flex items-center justify-center ${
-                    isInWishlist(product._id)
+                  className={`px-6 py-3 rounded-lg border-2 flex items-center justify-center ${isInWishlist(product._id)
                       ? "border-red-300 bg-red-50 text-red-600"
                       : "border-gray-300 text-gray-600 hover:border-gray-400"
-                  }`}
+                    }`}
                 >
                   <Heart className={`w-5 h-5 ${isInWishlist(product._id) ? "fill-current" : ""}`} />
                 </button>

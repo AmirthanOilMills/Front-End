@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import Modal from "../common/Modal";
 import { showToast } from "../common/Toast";
 import { deleteSingleProducts } from "../../api/admin/products";
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData }) => {
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
@@ -47,10 +46,12 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
                 price: initialData.price || "",
                 stock: initialData.stock ?? true,
                 is_active: initialData.is_active ?? true,
-                images: initialData.images?.map(img => ({
-                    url: `${BASE_URL}${img}`,
-                    file: null,
-                })) || [],
+                images:
+                    initialData.images?.map((img) => ({
+                        url: img.url,              // Cloudinary URL
+                        public_id: img.public_id,  // Needed for delete/update
+                        file: null,                // existing image
+                    })) || [],
                 health_benefits: initialData.health_benefits || [],
             });
         } else {
@@ -76,19 +77,16 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
         setForm({ ...form, [name]: type === "checkbox" ? checked : value });
     };
 
-
     // Delete Image
     const removeImage = async (index) => {
         const image = form.images[index];
 
-        // If it is an existing image → delete from server
+        // Existing image (already saved in DB)
         if (initialData && image.file === null) {
-            const imageUrl = image.url.replace(BASE_URL, "");
-
             try {
                 const response = await deleteSingleProducts({
                     product_id: initialData._id,
-                    image_url: imageUrl,
+                    public_id: image.public_id,
                 });
 
                 if (!response.status) {
@@ -98,7 +96,7 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
 
                 showToast(response.message, "success");
 
-                setForm(prev => ({
+                setForm((prev) => ({
                     ...prev,
                     images: prev.images.filter((_, i) => i !== index),
                 }));
@@ -106,22 +104,21 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
                 showToast("Failed to delete image", "error");
             }
         }
-
-        // If new image → only remove locally
+        // New image (not uploaded yet)
         else {
-            setForm(prev => ({
+            setForm((prev) => ({
                 ...prev,
                 images: prev.images.filter((_, i) => i !== index),
             }));
         }
     };
 
-
     // Upload new files
     const handleFileUpload = useCallback((files) => {
         const newImages = Array.from(files).map((file) => ({
             file,
             url: URL.createObjectURL(file),
+            public_id: null, // important
         }));
 
         setForm(prev => ({
@@ -129,6 +126,7 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
             images: [...prev.images, ...newImages],
         }));
     }, []);
+
 
     const handleDrop = (e) => {
         e.preventDefault();
@@ -160,6 +158,7 @@ const AddProductModal = ({ isOpen, onClose, onSubmit, categories, initialData })
             ...form,
             images: form.images.map(img => ({
                 url: img.url || null,
+                public_id: img.public_id || null,
                 file: img.file || null,
             })),
         });

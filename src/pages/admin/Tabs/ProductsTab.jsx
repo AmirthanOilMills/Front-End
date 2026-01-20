@@ -14,7 +14,6 @@ import {
 import { getAllCategory } from "../../../api/admin/category";
 import { showToast } from "../../../components/common/Toast";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const ProductsTab = () => {
   const [products, setProducts] = useState([]);
@@ -116,8 +115,13 @@ const ProductsTab = () => {
     );
 
     data.images.forEach((img) => {
-      if (img.file) formData.append("images", img.file);
-      else formData.append("old_images[]", img.url.replace(BASE_URL, ""));
+      if (img.file) {
+        // New image upload
+        formData.append("images", img.file);
+      } else {
+        // Existing image (send public_id)
+        formData.append("old_public_ids[]", img.public_id);
+      }
     });
 
     const res = editData
@@ -145,7 +149,7 @@ const ProductsTab = () => {
           }}
           className="bg-green-800 hover:bg-green-900 text-white font-semibold px-4 py-2 rounded-lg flex items-center justify-center gap-2 w-full sm:w-auto transition-colors"
         >
-          <Plus size={16} /> 
+          <Plus size={16} />
           <span>Add Product</span>
         </button>
       </div>
@@ -174,7 +178,7 @@ const ProductsTab = () => {
               onClick={() => setShowFilters(!showFilters)}
               className="lg:hidden flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors"
             >
-              <Filter size={16} /> 
+              <Filter size={16} />
               <span>Filters</span>
             </button>
 
@@ -208,7 +212,7 @@ const ProductsTab = () => {
               {/* Product Image */}
               <div className="relative h-48 bg-gray-100">
                 <img
-                  src={`${BASE_URL}${p.images?.[0]}`}
+                  src={p.images?.[0]?.url}
                   alt={p.product_name}
                   className="w-full h-full object-cover"
                 />
@@ -292,7 +296,7 @@ const ProductsTab = () => {
                   <tr key={p._id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 lg:px-6 py-4">
                       <img
-                        src={`${BASE_URL}${p.images?.[0]}`}
+                        src={p.images?.[0]?.url}
                         alt={p.product_name}
                         className="h-12 w-12 object-cover rounded"
                       />
@@ -354,6 +358,7 @@ const ProductsTab = () => {
         onClose={() => {
           setOpen(false);
           setEditData(null);
+          loadProducts();
         }}
         onSubmit={handleAddProduct}
         categories={categories}

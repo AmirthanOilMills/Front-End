@@ -47,78 +47,78 @@ const CheckoutPage = () => {
   const finalTotal = Math.round(finalTotalWithTax);
 
   // Input change
-const handleInputChange = (e) => {
-  const { name, value } = e.target;
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
 
-  setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
 
-  // validate while typing
-  setErrors(prev => {
-    const newErr = { ...prev };
+    // validate while typing
+    setErrors(prev => {
+      const newErr = { ...prev };
 
-    switch (name) {
-      case "name":
-        value.trim() ? delete newErr.name : newErr.name = "Name is required";
-        break;
+      switch (name) {
+        case "name":
+          value.trim() ? delete newErr.name : newErr.name = "Name is required";
+          break;
 
-      case "email":
-        if (!value.trim()) delete newErr.email;
-        else {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          emailRegex.test(value)
-            ? delete newErr.email
-            : newErr.email = "Invalid email";
-        }
-        break;
+        case "email":
+          if (!value.trim()) delete newErr.email;
+          else {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            emailRegex.test(value)
+              ? delete newErr.email
+              : newErr.email = "Invalid email";
+          }
+          break;
 
-      case "phone":
-        /^[0-9]{10}$/.test(value)
-          ? delete newErr.phone
-          : newErr.phone = "Phone must be 10 digits";
-        break;
+        case "phone":
+          /^[0-9]{10}$/.test(value)
+            ? delete newErr.phone
+            : newErr.phone = "Phone must be 10 digits";
+          break;
 
-      case "address":
-        value.trim()
-          ? delete newErr.address
-          : newErr.address = "Address required";
-        break;
+        case "address":
+          value.trim()
+            ? delete newErr.address
+            : newErr.address = "Address required";
+          break;
 
-      case "city":
-        value.trim()
-          ? delete newErr.city
-          : newErr.city = "City required";
-        break;
+        case "city":
+          value.trim()
+            ? delete newErr.city
+            : newErr.city = "City required";
+          break;
 
-      case "state":
-        value.trim()
-          ? delete newErr.state
-          : newErr.state = "State required";
-        break;
+        case "state":
+          value.trim()
+            ? delete newErr.state
+            : newErr.state = "State required";
+          break;
 
-      case "pincode":
-        /^[0-9]{6}$/.test(value)
-          ? delete newErr.pincode
-          : newErr.pincode = "PIN must be 6 digits";
-        break;
+        case "pincode":
+          /^[0-9]{6}$/.test(value)
+            ? delete newErr.pincode
+            : newErr.pincode = "PIN must be 6 digits";
+          break;
 
-      default:
-        break;
-    }
+        default:
+          break;
+      }
 
-    return newErr;
-  });
-};
+      return newErr;
+    });
+  };
 
 
- const validateBeforeSubmit = () => {
-  return Object.keys(errors).length === 0 &&
-  formData.name.trim() &&
-  formData.phone.trim() &&
-  formData.address.trim() &&
-  formData.city.trim() &&
-  formData.state.trim() &&
-  formData.pincode.trim();
-};
+  const validateBeforeSubmit = () => {
+    return Object.keys(errors).length === 0 &&
+      formData.name.trim() &&
+      formData.phone.trim() &&
+      formData.address.trim() &&
+      formData.city.trim() &&
+      formData.state.trim() &&
+      formData.pincode.trim();
+  };
 
 
   // -----------------------------
@@ -127,10 +127,10 @@ const handleInputChange = (e) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-  if (!validateBeforeSubmit()) {
-  alert("Please fix form errors.");
-  return;
-}
+    if (!validateBeforeSubmit()) {
+      alert("Please fix form errors.");
+      return;
+    }
 
     if (cart.length === 0) {
       alert("Your cart is empty!");
@@ -355,7 +355,6 @@ const handleInputChange = (e) => {
                 <input
                   type="text"
                   name="name"
-                  
                   value={formData.name}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 border rounded-md ${errors.name ? "border-red-500" : ""}`}
@@ -380,7 +379,6 @@ const handleInputChange = (e) => {
                 <input
                   type="tel"
                   name="phone"
-                  
                   value={formData.phone}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 border rounded-md ${errors.phone ? "border-red-500" : ""}`}
@@ -392,7 +390,6 @@ const handleInputChange = (e) => {
                 <label className="block mb-2">Address *</label>
                 <textarea
                   name="address"
-                  
                   value={formData.address}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 border rounded-md ${errors.address ? "border-red-500" : ""}`}
@@ -405,7 +402,6 @@ const handleInputChange = (e) => {
                   type="text"
                   name="city"
                   placeholder="City *"
-                  
                   value={formData.city}
                   onChange={handleInputChange}
                   className={`px-3 py-2 border rounded-md ${errors.city ? "border-red-500" : ""}`}
@@ -415,7 +411,6 @@ const handleInputChange = (e) => {
                   type="text"
                   name="state"
                   placeholder="State *"
-                  
                   value={formData.state}
                   onChange={handleInputChange}
                   className={`px-3 py-2 border rounded-md ${errors.state ? "border-red-500" : ""}`}
@@ -426,7 +421,6 @@ const handleInputChange = (e) => {
                   name="pincode"
                   placeholder="PIN *"
                   pattern="[0-9]{6}"
-                  
                   value={formData.pincode}
                   onChange={handleInputChange}
                   className={`px-3 py-2 border rounded-md ${errors.pincode ? "border-red-500" : ""}`}
@@ -478,7 +472,11 @@ const handleInputChange = (e) => {
             <div className="space-y-4 mb-6">
               {cart.map(item => (
                 <div key={item.id || item._id} className="flex items-center space-x-3">
-                  <img src={`${import.meta.env.VITE_BASE_URL}${item.images[0]}`} className="w-12 h-12 object-cover rounded" />
+                  <img
+                    src={item.images?.[0]?.url || "/no-image.png"}
+                    className="w-12 h-12 object-cover rounded"
+                    alt={item.product_name}
+                  />
                   <div className="flex-1">
                     <p className="text-sm font-medium">{item.product_name}</p>
                     <p className="text-sm text-gray-500">Qty: {item.qty}</p>
