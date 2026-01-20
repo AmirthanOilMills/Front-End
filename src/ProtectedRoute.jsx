@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children }) => {
           setLogin(res.user);                // ✅ Store in AuthContext
         }
       } catch (err) {
-        console.log("User not logged in");
+        console.error("User not logged in");
       } finally {
         setLoading(false);
       }
