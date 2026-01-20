@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ShoppingCart, Heart, Minus, Plus, Star, Leaf } from 'lucide-react';
-import useStore from '../helpers/useStore';
-import { mockProducts } from '../data/mockData';
-import ProductCard from '../components/ProductCard';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import {
+  ArrowLeft,
+  ShoppingCart,
+  Heart,
+  Minus,
+  Plus,
+  Star,
+  Leaf,
+} from "lucide-react";
+import useStore from "../helpers/useStore";
+import { mockProducts } from "../data/mockData";
+import ProductCard from "../components/ProductCard";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const ProductDetailPage = () => {
   const location = useLocation();
@@ -36,16 +44,21 @@ const ProductDetailPage = () => {
   }, [isHovered, product.images.length]);
 
   // Next + Prev slide
-  const nextSlide = () => setCurrentIndex((prev) =>
-    prev === product.images.length - 1 ? 0 : prev + 1
-  );
-  const prevSlide = () => setCurrentIndex((prev) =>
-    prev === 0 ? product.images.length - 1 : prev - 1
-  );
+  const nextSlide = () =>
+    setCurrentIndex((prev) =>
+      prev === product.images.length - 1 ? 0 : prev + 1
+    );
+  const prevSlide = () =>
+    setCurrentIndex((prev) =>
+      prev === 0 ? product.images.length - 1 : prev - 1
+    );
 
   // Related Products
   const relatedProducts = mockProducts
-    .filter((p) => p.category === product.category_id.category_name && p.id !== product._id)
+    .filter(
+      (p) =>
+        p.category === product.category_id.category_name && p.id !== product._id
+    )
     .slice(0, 4);
 
   // Add to cart
@@ -61,10 +74,9 @@ const ProductDetailPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
         {/* Back Button */}
         <button
-          onClick={() => navigate('/products')}
+          onClick={() => navigate("/products")}
           className="flex items-center text-green-800 hover:text-green-900 mb-6"
         >
           <ArrowLeft className="w-5 h-5 mr-2" /> Back to Products
@@ -73,7 +85,6 @@ const ProductDetailPage = () => {
         {/* Product Container */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
-
             {/* Product Image */}
             <div
               className="relative w-full group overflow-hidden"
@@ -91,7 +102,8 @@ const ProductDetailPage = () => {
                 {product.images.map((_, idx) => (
                   <div
                     key={idx}
-                    className={`w-2 h-2 rounded-full ${currentIndex === idx ? "bg-white" : "bg-white/50"}`}
+                    className={`w-2 h-2 rounded-full ${currentIndex === idx ? "bg-white" : "bg-white/50"
+                      }`}
                   />
                 ))}
               </div>
@@ -99,27 +111,26 @@ const ProductDetailPage = () => {
 
             {/* Product Info */}
             <div className="flex flex-col">
-
               {/* Category */}
-              <span className="inline-block bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full mb-4">
+              <span className="inline-block bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full mb-4 w-fit">
                 {product.category_id.category_name}
               </span>
 
               {/* Name */}
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              <h1 className="md:text-3xl text-xl font-bold text-gray-900 mb-4">
                 {product.product_name}
               </h1>
 
               {/* Rating */}
-              <div className="flex items-center mb-4">
+              {/* <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                 ))}
                 <span className="text-gray-600 ml-2">(24 reviews)</span>
-              </div>
+              </div> */}
 
               {/* Price */}
-              <div className="text-3xl font-bold text-green-800 mb-6">
+              <div className="md:text-3xl text-2xl font-bold text-green-800 mb-3">
                 ₹{product.price}
               </div>
 
@@ -156,7 +167,7 @@ const ProductDetailPage = () => {
               <div className="flex gap-4 mb-8">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 py-3 px-6 rounded-lg font-semibold bg-green-800 hover:bg-green-900 text-white flex items-center justify-center space-x-2"
+                  className="flex-1 py-3 md:px-6 px-1 rounded-lg font-semibold bg-green-800 hover:bg-green-900 text-white flex items-center justify-center space-x-2"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   <span>Add to Cart</span>
@@ -164,12 +175,15 @@ const ProductDetailPage = () => {
 
                 <button
                   onClick={handleWishlistClick}
-                  className={`px-6 py-3 rounded-lg border-2 flex items-center justify-center ${isInWishlist(product._id)
+                  className={`md:px-6 px-4 py-3 rounded-lg border-2 flex items-center justify-center ${isInWishlist(product._id)
                       ? "border-red-300 bg-red-50 text-red-600"
                       : "border-gray-300 text-gray-600 hover:border-gray-400"
                     }`}
                 >
-                  <Heart className={`w-5 h-5 ${isInWishlist(product._id) ? "fill-current" : ""}`} />
+                  <Heart
+                    className={`w-5 h-5 ${isInWishlist(product._id) ? "fill-current" : ""
+                      }`}
+                  />
                 </button>
               </div>
 
@@ -192,26 +206,32 @@ const ProductDetailPage = () => {
         </div>
 
         {/* Benefits */}
-        <div className="mt-8 bg-white rounded-lg shadow-lg p-8">
-          <div className="flex items-center mb-6">
-            <Leaf className="w-6 h-6 text-green-800 mr-3" />
-            <h2 className="text-2xl font-bold text-gray-900">Health Benefits</h2>
-          </div>
+        {product.health_benefits.length > 0 && (
+          <div className="mt-8 bg-white rounded-lg shadow-lg p-8">
+            <div className="flex items-center mb-6">
+              <Leaf className="w-6 h-6 text-green-800 mr-3" />
+              <h2 className="text-2xl font-bold text-gray-900">
+                Health Benefits
+              </h2>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {product.health_benefits.map((b, i) => (
-              <div key={i} className="flex items-start">
-                <div className="w-2 h-2 bg-green-600 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">{b}</span>
-              </div>
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {product.health_benefits.map((b, i) => (
+                <div key={i} className="flex items-start">
+                  <div className="w-2 h-2 bg-green-600 rounded-full mt-2 mr-3"></div>
+                  <span className="text-gray-700">{b}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Related Products */}
-        {relatedProducts.length > 0 && (
+        {/* {relatedProducts.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Related Products</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Related Products
+            </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedProducts.map((rp) => (
@@ -219,13 +239,13 @@ const ProductDetailPage = () => {
                   key={rp.id}
                   product={rp}
                   onViewDetails={() =>
-                    navigate('/product', { state: { product: rp } })
+                    navigate("/product", { state: { product: rp } })
                   }
                 />
               ))}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
