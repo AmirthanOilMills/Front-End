@@ -55,7 +55,7 @@ const WishlistPage = () => {
               {/* PRODUCT IMAGE */}
               <div className="relative">
                 <img
-                  src={product.images?.[0]?.url || "/no-image.png"}
+                  src={product.images?.[0]?.url || "../assets/no-image.png"}
                   alt={product.product_name}
                   className="w-full h-48 object-cover"
                 />

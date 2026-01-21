@@ -59,7 +59,7 @@ const CartPage = () => {
                   {/* PRODUCT IMAGE */}
                   <div className="flex-shrink-0 mx-auto sm:mx-0">
                     <img
-                      src={item.images?.[0]?.url || "/no-image.png"}
+                      src={item.images?.[0]?.url || "../assets/no-image.png"}
                       alt={item.product_name}
                       className="w-28 h-28 object-cover rounded-lg border"
                     />

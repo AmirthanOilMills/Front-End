@@ -473,7 +473,7 @@ const CheckoutPage = () => {
               {cart.map(item => (
                 <div key={item.id || item._id} className="flex items-center space-x-3">
                   <img
-                    src={item.images?.[0]?.url || "/no-image.png"}
+                    src={item.images?.[0]?.url || "../assets/no-image.png"}
                     className="w-12 h-12 object-cover rounded"
                     alt={item.product_name}
                   />

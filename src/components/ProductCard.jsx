@@ -69,7 +69,7 @@ const ProductCard = ({ product, onViewDetails }) => {
         onMouseLeave={() => setIsHovered(false)}
       >
         <img
-          src={images[currentIndex]?.url || "/no-image.png"}
+          src={images[currentIndex]?.url || "../assets/no-image.png"}
           alt={product.product_name}
           className="w-full h-full object-cover transition-all duration-500"
         />
