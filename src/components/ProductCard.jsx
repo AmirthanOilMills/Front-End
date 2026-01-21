@@ -19,16 +19,19 @@ const ProductCard = ({ product, onViewDetails }) => {
   );
 
   // Automatic slideshow when not hovered
+  const images = product?.images || [];
+
   useEffect(() => {
-    if (!isHovered) {
+    if (!isHovered && images.length > 1) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) =>
-          prev === product.images?.length - 1 ? 0 : prev + 1
+          prev === images.length - 1 ? 0 : prev + 1
         );
-      }, 5000); // Slide every 5 seconds
+      }, 5000);
+
       return () => clearInterval(interval);
     }
-  }, [isHovered, product.images]);
+  }, [isHovered, images.length]);
 
   // Navigate to next slide
   const nextSlide = () => {
@@ -54,10 +57,6 @@ const ProductCard = ({ product, onViewDetails }) => {
     }
   };
 
-  // Fallback image if product has no images
-  const images = product.images && product.images.length > 0
-    ? product.images
-    : ["/no-image.png"];
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg hover:scale-105 transition-transform transition-shadow
@@ -70,7 +69,7 @@ const ProductCard = ({ product, onViewDetails }) => {
         onMouseLeave={() => setIsHovered(false)}
       >
         <img
-          src={images[currentIndex].url}
+          src={images[currentIndex]?.url || "/no-image.png"}
           alt={product.product_name}
           className="w-full h-full object-cover transition-all duration-500"
         />
