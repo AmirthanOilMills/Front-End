@@ -471,7 +471,7 @@ const CheckoutPage = () => {
             <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
             <div className="space-y-4 mb-6">
               {cart.map(item => (
-                <div key={item.id || item._id} className="flex items-center space-x-3">
+                <div key={item.cartId || item.id || item._id} className="flex items-center space-x-3">
                   <img
                     src={item.images?.[0]?.url || "../assets/no-image.png"}
                     className="w-12 h-12 object-cover rounded"

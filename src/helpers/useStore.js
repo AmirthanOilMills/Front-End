@@ -7,36 +7,52 @@ import { persist } from "zustand/middleware";
 const createCartSlice = (set, get) => ({
     cart: [],
 
-    addToCart: (product, qty = 1) => {
-        const exists = get().cart.find(item => item._id === product._id);
+    addToCart: (product, qty = 1, selectedVariant = null) => {
+        const cartId = selectedVariant
+            ? `${product._id}-${selectedVariant.volume_size}`
+            : product.cartId || product._id;
+
+        const exists = get().cart.find(item => (item.cartId || item._id) === cartId);
 
         if (exists) {
             // Update only quantity
             set({
                 cart: get().cart.map(item =>
-                    item._id === product._id
+                    (item.cartId || item._id) === cartId
                         ? { ...item, qty: item.qty + qty }
                         : item
                 )
             });
         } else {
+            const finalPrice = selectedVariant ? selectedVariant.selling_price : product.price;
+            const finalMrp = selectedVariant ? selectedVariant.mrp : product.mrp;
+            const finalName = selectedVariant ? `${product.product_name} (${selectedVariant.volume_size})` : product.product_name;
+
             set({
-                cart: [...get().cart, { ...product, qty }]
+                cart: [...get().cart, { 
+                    ...product, 
+                    cartId, 
+                    price: finalPrice, 
+                    mrp: finalMrp, 
+                    product_name: finalName,
+                    selectedVolume: selectedVariant ? selectedVariant.volume_size : null,
+                    qty 
+                }]
             });
         }
     },
 
-    updateCartQty: (_id, qty) => {
+    updateCartQty: (cartId, qty) => {
         set({
             cart: get().cart.map(item =>
-                item._id === _id ? { ...item, qty } : item
+                (item.cartId || item._id) === cartId ? { ...item, qty } : item
             )
         });
     },
 
-    removeFromCart: (_id) => {
+    removeFromCart: (cartId) => {
         set({
-            cart: get().cart.filter(item => item._id !== _id)
+            cart: get().cart.filter(item => (item.cartId || item._id) !== cartId)
         });
     },
 

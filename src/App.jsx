@@ -26,8 +26,10 @@ import WishlistPage from "./pages/WishlistPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 
-import AdminLoginPage from "./pages/admin/AdminLoginPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import OrderPage from "./pages/OrderPage";
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -85,15 +87,26 @@ function AppRoutes() {
           <Route path="/product" element={<ProductDetailPage />} />
           <Route path="/orders" element={<OrderPage />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <CheckoutPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Route>
+        
+        {/* Auth pages under loader but without store header/footer */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
       </Route>
 
       {/* Admin */}
-      <Route path="/login" element={<AdminLoginPage />} />
       <Route
         path="/admin/*"
         element={

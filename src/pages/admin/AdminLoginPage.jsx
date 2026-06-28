@@ -14,6 +14,7 @@ const AdminLoginPage = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
@@ -21,13 +22,34 @@ const AdminLoginPage = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    if (errors[e.target.name]) {
+      setErrors({
+        ...errors,
+        [e.target.name]: ''
+      });
+    }
     setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError('');
+
+    // Custom validation
+    const newErrors = {};
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Enter a valid email";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       const res = await login(formData);
@@ -41,7 +63,7 @@ const AdminLoginPage = () => {
 
     } catch (err) {
       console.error("Login error:", err);
-      setError(err?.message);
+      setError(err?.response?.data?.message || err?.message || "An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -73,18 +95,24 @@ const AdminLoginPage = () => {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
+                    <User className={`h-5 w-5 transition-colors ${errors.email ? 'text-red-400' : 'text-gray-400'}`} />
                   </div>
                   <input
                     type="email"
                     name="email"
-                    required
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-md focus:ring-2 focus:border-transparent outline-none transition-all ${
+                      errors.email 
+                        ? 'border-red-300 focus:ring-red-500 bg-red-50/10' 
+                        : 'border-gray-300 focus:ring-green-500'
+                    }`}
                     placeholder="Enter your email"
                   />
                 </div>
+                {errors.email && (
+                  <p className="mt-1 text-xs text-red-600 font-semibold">{errors.email}</p>
+                )}
               </div>
 
               <div>
@@ -93,29 +121,35 @@ const AdminLoginPage = () => {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    <Lock className={`h-5 w-5 transition-colors ${errors.password ? 'text-red-400' : 'text-gray-400'}`} />
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
-                    required
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className={`w-full pl-10 pr-12 py-3 border rounded-md focus:ring-2 focus:border-transparent outline-none transition-all ${
+                      errors.password 
+                        ? 'border-red-300 focus:ring-red-500 bg-red-50/10' 
+                        : 'border-gray-300 focus:ring-green-500'
+                    }`}
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400" />
+                      <EyeOff className="h-5 w-5" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400" />
+                      <Eye className="h-5 w-5" />
                     )}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="mt-1 text-xs text-red-600 font-semibold">{errors.password}</p>
+                )}
               </div>
             </div>
 

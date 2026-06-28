@@ -1,33 +1,31 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getCurrentUser } from "./api/auth";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
+
 const ProtectedRoute = ({ children }) => {
-  const { user, setLogin } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuth();
+  const location = useLocation();
 
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const res = await getCurrentUser();   // 🍪 auto-sent by browser
-        if (res?.status) {
-          setLogin(res.user);                // ✅ Store in AuthContext
-        }
-      } catch (err) {
-        console.error("User not logged in");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkUser();
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-800"></div>
+      </div>
+    );
+  }
 
   // After loading, if user still not available → redirect
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) {
+    if (location.pathname.startsWith("/admin")) {
+      return <Navigate to="/admin/login" state={{ from: location }} replace />;
+    }
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // If trying to access admin dashboard, ensure the user is an admin
+  if (location.pathname.startsWith("/admin") && user.role !== "admin") {
+    return <Navigate to="/admin/login" replace />;
+  }
 
   return children;
 };

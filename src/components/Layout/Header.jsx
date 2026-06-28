@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { ShoppingCart, Heart, Menu, X, User, Phone , Truck  } from 'lucide-react';
 import useStore from '../../helpers/useStore'; // Zustand store
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   // Zustand store
   const cart = useStore((state) => state.cart);
@@ -119,13 +122,78 @@ const Header = () => {
               )} */}
             </button>
 
-            {/* Admin Login */}
-            {/* <button
-              onClick={() => navigate('/admin')}
-              className="p-2 text-gray-600 hover:text-green-800"
-            >
-              <User className="w-6 h-6" />
-            </button> */}
+            {/* User Account Dropdown */}
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center space-x-1 p-1 sm:p-2 text-gray-600 hover:text-green-800 focus:outline-none transition-colors duration-150"
+                  aria-label="User menu"
+                >
+                  <div className="w-8 h-8 rounded-full bg-green-100 border border-green-200 flex items-center justify-center text-green-800 font-bold text-sm">
+                    {user.name ? user.name[0].toUpperCase() : 'U'}
+                  </div>
+                </button>
+
+                {isProfileOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsProfileOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-xl border border-gray-100 py-2 z-20 origin-top-right transition-all transform scale-100">
+                      <div className="px-4 py-2.5 border-b border-gray-100">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Signed in as</p>
+                        <p className="text-sm font-semibold text-gray-900 truncate mt-0.5">{user.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      </div>
+                      <div className="py-1">
+                        <button
+                          onClick={() => {
+                            navigate('/orders');
+                            setIsProfileOpen(false);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 transition-colors"
+                        >
+                          My Orders
+                        </button>
+                        {user.role === 'admin' && (
+                          <button
+                            onClick={() => {
+                              navigate('/admin');
+                              setIsProfileOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 transition-colors"
+                          >
+                            Admin Dashboard
+                          </button>
+                        )}
+                      </div>
+                      <div className="border-t border-gray-100 pt-1">
+                        <button
+                          onClick={() => {
+                            logout();
+                            setIsProfileOpen(false);
+                            navigate('/');
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-green-800 hover:bg-green-900 text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm hover:shadow"
+              >
+                <User className="w-4 h-4" />
+                <span>Sign In</span>
+              </button>
+            )}
 
             {/* Mobile Menu Button */}
             <button

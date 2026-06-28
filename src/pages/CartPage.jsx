@@ -51,7 +51,7 @@ const CartPage = () => {
           <div className="lg:col-span-2 space-y-4">
             {cart.map((item) => (
               <div
-                key={item._id}
+                key={item.cartId || item._id}
                 className="bg-white rounded-xl shadow-sm border p-4 sm:p-6"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6 gap-4">
@@ -71,12 +71,19 @@ const CartPage = () => {
                       {item.product_name}
                     </h3>
 
-                    <p className="text-sm text-gray-500 mt-1">
-                      Category:{" "}
-                      <span className="font-medium text-gray-700">
-                        {item?.category_id?.category_name || "Unknown Category"}
+                    <div className="flex flex-wrap items-center gap-2 mt-1 justify-center sm:justify-start">
+                      <span className="text-sm text-gray-500">
+                        Category:{" "}
+                        <span className="font-medium text-gray-700">
+                          {item?.category_id?.category_name || "Unknown Category"}
+                        </span>
                       </span>
-                    </p>
+                      {item.selectedVolume && (
+                        <span className="bg-green-150 text-green-800 text-xs px-2.5 py-0.5 rounded-full font-semibold border border-green-200">
+                          Volume: {item.selectedVolume}
+                        </span>
+                      )}
+                    </div>
 
                     <p className="mt-3 text-sm text-gray-500">Price</p>
                     <p className="text-lg font-bold text-green-800">
@@ -90,7 +97,7 @@ const CartPage = () => {
 
                     <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
                       <button
-                        onClick={() => updateQty(item._id, Math.max(1, item.qty - 1))}
+                        onClick={() => updateQty(item.cartId || item._id, Math.max(1, item.qty - 1))}
                         className="p-2 hover:bg-gray-100 transition"
                         aria-label="Decrease quantity"
                       >
@@ -102,7 +109,7 @@ const CartPage = () => {
                       </span>
 
                       <button
-                        onClick={() => updateQty(item._id, item.qty + 1)}
+                        onClick={() => updateQty(item.cartId || item._id, item.qty + 1)}
                         className="p-2 hover:bg-gray-100 transition"
                         aria-label="Increase quantity"
                       >
@@ -111,7 +118,7 @@ const CartPage = () => {
                     </div>
 
                     <button
-                      onClick={() => removeFromCart(item._id)}
+                      onClick={() => removeFromCart(item.cartId || item._id)}
                       className="
                       inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 text-sm font-medium text-white rounded-lg cursor-pointer hover:bg-red-500 hover:text-white
                       transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"

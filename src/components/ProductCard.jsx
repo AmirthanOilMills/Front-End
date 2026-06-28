@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { ShoppingCart, Heart, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import useStore from "../helpers/useStore"; // Zustand store
 
 const ProductCard = ({ product, onViewDetails }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [isHovered, setIsHovered] = useState(false); // Track hover state for slideshow
   const [currentIndex, setCurrentIndex] = useState(0); // Current slide index
 
@@ -116,18 +120,28 @@ const ProductCard = ({ product, onViewDetails }) => {
 
       {/* PRODUCT DETAILS */}
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+        <h3 className="text-lg font-semibold text-gray-800 mb-1">
           {product.product_name}
         </h3>
 
-        {/* <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-          {product.product_desc}
-        </p> */}
+        {/* Volume/Sizes Badge */}
+        {product.variants && product.variants.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-1 mb-3">
+            <span className="text-[10px] text-gray-400 font-bold uppercase">Sizes:</span>
+            {product.variants.map((v, idx) => (
+              <span key={idx} className="bg-green-50 text-green-800 border border-green-200/50 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+                {v.volume_size}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <div className="h-4 mb-3"></div>
+        )}
 
         {/* PRICE & CATEGORY */}
         <div className="flex items-center justify-between">
           <span className="text-2xl font-bold text-green-800">
-            ₹{product.price}
+            ₹{product.variants && product.variants.length > 0 ? product.variants[0].selling_price : product.price}
           </span>
 
           <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -137,7 +151,9 @@ const ProductCard = ({ product, onViewDetails }) => {
 
         {/* ADD TO CART BUTTON */}
         <button
-          onClick={() => addToCart(product)}
+          onClick={() => {
+            addToCart(product);
+          }}
           disabled={!product.stock}
           className={`w-full mt-4 py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center space-x-2 ${product.stock
             ? "bg-green-800 hover:bg-green-900 text-white"

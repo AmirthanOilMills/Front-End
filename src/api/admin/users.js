@@ -15,3 +15,7 @@ export function deleteUser(data){
 export function updateUser(id,data){
     return putRequest(`/admin/users/${id}`,data)
 }
+
+export function getAllCustomers() {
+    return getRequest('/admin/users/customers');
+}

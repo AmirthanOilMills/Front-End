@@ -97,32 +97,62 @@ const ProductsTab = () => {
 
   /* ================= ADD / UPDATE ================= */
   const handleAddProduct = async (data) => {
-    if (!data.images || data.images.length === 0) {
-      showToast("Please upload at least one image", "error");
+    // Validate main image exists
+    const hasMainImage = data.main_image && (data.main_image.file || data.main_image.url);
+    if (!hasMainImage) {
+      showToast("Please upload a main product image", "error");
       return;
     }
 
     const formData = new FormData();
+    
+    // Add text fields
     formData.append("product_name", data.product_name);
-    formData.append("product_desc", data.product_desc);
+    formData.append("tagline", data.tagline || "");
+    formData.append("product_desc", data.product_desc || "");
     formData.append("category_id", data.category_id);
-    formData.append("price", data.price);
-    formData.append("stock", data.stock);
+    
+    formData.append("mrp", data.mrp || 0);
+    formData.append("price", data.price || 0);
+    formData.append("stock_qty", data.stock_qty || 0);
+    formData.append("stock_status", data.stock_status || "In Stock");
+    
+    formData.append("oil_type", data.oil_type || "");
+    formData.append("extraction_type", data.extraction_type || "Cold Pressed");
+    formData.append("ingredients", data.ingredients || "");
+    formData.append("shelf_life", data.shelf_life || "");
+    formData.append("fssai_number", data.fssai_number || "");
+    
     formData.append("is_active", data.is_active);
 
-    data.health_benefits.forEach((b) =>
-      formData.append("health_benefits[]", b)
-    );
+    // Add JSON stringified objects
+    formData.append("variants", JSON.stringify(data.variants || []));
+    formData.append("health_benefits", JSON.stringify(data.health_benefits || []));
 
-    data.images.forEach((img) => {
+    // Handle files and old public keys (for update checks)
+    
+    // Main Image
+    if (data.main_image?.file) {
+      formData.append("main_image", data.main_image.file);
+    } else if (data.main_image?.public_id) {
+      formData.append("old_main_image", JSON.stringify({
+        url: data.main_image.url,
+        public_id: data.main_image.public_id
+      }));
+    } else {
+      formData.append("old_main_image", "null");
+    }
+
+    // Gallery Images
+    const oldGallery = [];
+    (data.gallery_images || []).forEach(img => {
       if (img.file) {
-        // New image upload
-        formData.append("images", img.file);
-      } else {
-        // Existing image (send public_id)
-        formData.append("old_public_ids[]", img.public_id);
+        formData.append("gallery_images", img.file);
+      } else if (img.public_id) {
+        oldGallery.push({ url: img.url, public_id: img.public_id });
       }
     });
+    formData.append("old_gallery_images", JSON.stringify(oldGallery));
 
     const res = editData
       ? await updateProducts(editData._id, formData)
@@ -224,6 +254,15 @@ const ProductsTab = () => {
                   <h3 className="font-semibold text-gray-900 text-base">
                     {p.product_name}
                   </h3>
+                  {p.variants && p.variants.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1 mb-1.5">
+                      {p.variants.map((v, idx) => (
+                        <span key={idx} className="bg-green-50 text-green-800 border border-green-200/50 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                          {v.volume_size}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <p className="text-sm text-gray-500 mt-1">
                     {p.category_id?.category_name}
                   </p>
@@ -302,7 +341,16 @@ const ProductsTab = () => {
                       />
                     </td>
                     <td className="px-4 lg:px-6 py-4 text-sm font-medium text-gray-900">
-                      {p.product_name}
+                      <div>{p.product_name}</div>
+                      {p.variants && p.variants.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {p.variants.map((v, idx) => (
+                            <span key={idx} className="bg-green-50 text-green-800 border border-green-200/50 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                              {v.volume_size}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 lg:px-6 py-4 text-sm text-gray-700">
                       {p.category_id?.category_name}

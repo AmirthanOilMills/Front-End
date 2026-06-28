@@ -23,6 +23,7 @@ import AdminsTab from "./Tabs/UsersTab";
 import CategoriesTab from "./Tabs/CategoriesTab";
 import PaymentTab from "./Tabs/PaymentTab";
 import ContactFormTab from "./Tabs/ContactFormTab";
+import CustomersTab from "./Tabs/CustomersTab";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -42,6 +43,7 @@ const AdminDashboard = () => {
     { name: "Orders", path: "orders", icon: ShoppingCart },
     { name: "Payments", path: "payments", icon: CreditCard },
     { name: "Contact", path: "contact", icon: MessageSquare },
+    { name: "Customers", path: "customers", icon: Users },
   ];
 
   if (user?.role === "admin") {
@@ -132,6 +134,7 @@ const AdminDashboard = () => {
             <Route path="orders" element={<OrdersTab />} />
             <Route path="payments" element={<PaymentTab />} />
             <Route path="contact" element={<ContactFormTab />} />
+            <Route path="customers" element={<CustomersTab />} />
             {user?.role === "admin" && (
               <Route path="admins" element={<AdminsTab />} />
             )}

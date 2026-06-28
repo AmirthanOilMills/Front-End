@@ -2,9 +2,11 @@ import React from 'react';
 import { Heart, ShoppingCart, X } from 'lucide-react';
 import useStore from '../helpers/useStore';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const WishlistPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Zustand store hooks
   const wishlist = useStore((state) => state.wishlist);
