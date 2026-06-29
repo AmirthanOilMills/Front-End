@@ -16,7 +16,7 @@ import Header from "./components/Layout/Header";
 import Footer from "./components/Layout/Footer";
 import WhatsAppButton from "./components/WhatsAppButton";
 
-// Pages
+// Pages for the application
 import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
