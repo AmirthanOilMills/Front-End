@@ -51,8 +51,8 @@ export async function updateOrderStatus(id, newOrderStatus) {
   }
 }
 
-export function getOrderbyOrderId(orderIds) {
-  const res = postRequest("/order/order", { orderIds });
+export function getOrderbyOrderId(payload) {
+  const res = postRequest("/order/order", payload);
   return res;
 }
 

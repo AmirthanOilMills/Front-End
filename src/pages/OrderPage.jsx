@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useStore from "../helpers/useStore";
 import { getOrderbyOrderId } from "../api/public/Order";
+import { useAuth } from "../contexts/AuthContext";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -13,7 +14,8 @@ const statusColors = {
 };
 
 const OrderPage = () => {
-  // const storeOrderIds = useStore((state) => state.orders); // stored orderIds
+  const storeOrderIds = useStore((state) => state.orders); // stored orderIds
+  const { user } = useAuth();
 
   const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
@@ -21,20 +23,22 @@ const OrderPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 👉 Initial load: fetch all orders using store IDs
-  // useEffect(() => {
-  //   if (storeOrderIds?.length > 0) {
-  //     fetchOrders(storeOrderIds);
-  //   }
-  // }, [storeOrderIds]);
+  // 👉 Initial load: fetch all orders using email (if logged in) or store IDs (if guest)
+  useEffect(() => {
+    if (user?.email) {
+      fetchOrders({ email: user.email });
+    } else if (storeOrderIds?.length > 0) {
+      fetchOrders({ orderIds: storeOrderIds });
+    }
+  }, [storeOrderIds, user]);
 
   // ================= API CALL =================
-  const fetchOrders = async (orderIds) => {
+  const fetchOrders = async (payload) => {
     try {
       setLoading(true);
       setError("");
 
-      const res = await getOrderbyOrderId(orderIds); // POST { orderIds }
+      const res = await getOrderbyOrderId(payload); // POST payload
       setOrders(res?.orders || []);
 
       if (!res?.orders || res.orders.length === 0) {
@@ -50,14 +54,18 @@ const OrderPage = () => {
 
   // ================= SEARCH HANDLER =================
   const handleSearch = () => {
-    // 🔹 If search empty → fetch all orders from store
+    // 🔹 If search empty → fetch all orders from store or email
     if (!search.trim()) {
-      fetchOrders(storeOrderIds);
+      if (user?.email) {
+        fetchOrders({ email: user.email });
+      } else {
+        fetchOrders({ orderIds: storeOrderIds });
+      }
       return;
     }
 
     // 🔹 If search has value → send only that ID
-    fetchOrders([search.trim().toLowerCase()]);
+    fetchOrders({ orderIds: [search.trim().toLowerCase()] });
   };
 
   const toggleExpand = (orderId) => {
@@ -190,17 +198,7 @@ const OrderPage = () => {
                     <span className="font-bold text-green-700">₹{order.total}</span>
                   </div>
 
-                  {/* Invoice */}
-                  {order.invoiceUrl && (
-                    <a
-                      href={`${BASE_URL}/${order.invoiceUrl}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block px-4 py-2 bg-green-600 text-white font-semibold rounded-md mt-4 hover:bg-green-700 transition"
-                    >
-                      Download Invoice
-                    </a>
-                  )}
+
                 </div>
               )}
             </div>

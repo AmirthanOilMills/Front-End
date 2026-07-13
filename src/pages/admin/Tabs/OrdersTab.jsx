@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, ChevronLeft, ChevronRight, X, Package, User, Phone, Mail, MapPin, CreditCard, FileText } from "lucide-react";
 import { getAllOrders, updateOrderStatus, updateStatus } from "../../../api/public/Order";
 
 const OrdersTab = () => {
@@ -35,6 +35,12 @@ const OrdersTab = () => {
     try {
       const res = await updateStatus(id, newStatus);
       fetchOrders();
+      if (selectedOrder && selectedOrder._id === id) {
+        setSelectedOrder((prev) => ({
+          ...prev,
+          status: res.status || (newStatus.charAt(0).toUpperCase() + newStatus.slice(1)),
+        }));
+      }
     } catch (err) {
       console.error("Failed to update order status:", err);
       alert("Failed to update status.");
@@ -43,8 +49,14 @@ const OrdersTab = () => {
 
   const handleOrderStatusChange = async (id, newOrderStatus) => {
     try {
-      await updateOrderStatus(id, newOrderStatus);
+      const res = await updateOrderStatus(id, newOrderStatus);
       fetchOrders();
+      if (selectedOrder && selectedOrder._id === id) {
+        setSelectedOrder((prev) => ({
+          ...prev,
+          orderStatus: res.orderStatus || (newOrderStatus.charAt(0).toUpperCase() + newOrderStatus.slice(1)),
+        }));
+      }
     } catch (err) {
       alert("Failed to update order status.");
     }
@@ -220,7 +232,10 @@ const OrdersTab = () => {
                     <td className="px-4 xl:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       #{order.orderId}
                     </td>
-                    <td className="px-4 xl:px-6 py-4 text-sm text-gray-900">{order.userName}{order.phone}</td>
+                    <td className="px-4 xl:px-6 py-4 text-sm text-gray-900">
+                      <div className="font-semibold text-gray-900">{order.userName}</div>
+                      <div className="text-gray-500 text-xs">{order.phone}</div>
+                    </td>
                     <td className="px-4 xl:px-6 py-4 text-sm font-semibold text-green-700">
                       ₹{order.total}
                     </td>
@@ -371,64 +386,228 @@ const OrdersTab = () => {
       {/* ------------------ POPUP MODAL ------------------ */}
       {showModal && selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-          <div className="bg-white p-4 md:p-6 rounded-lg w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto">
-            <h2 className="text-base md:text-lg font-bold mb-4">
-              Order Items - #{selectedOrder.orderId}
-            </h2>
+          <div className="bg-white p-4 md:p-6 rounded-lg w-full max-w-3xl shadow-lg max-h-[95vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex justify-between items-start border-b pb-4 mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <Package className="w-6 h-6 text-green-600" />
+                  Order Details
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  ID: <span className="font-mono font-semibold text-gray-800">#{selectedOrder.orderId}</span>
+                </p>
+                <p className="text-xs text-gray-400">
+                  Placed on: {new Date(selectedOrder.createdAt).toLocaleString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true
+                  })}
+                </p>
+              </div>
+              <button
+                onClick={closeModal}
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-500" />
+              </button>
+            </div>
 
-            {/* Mobile View - Card Layout */}
-            <div className="block md:hidden space-y-3">
-              {selectedOrder.items.map((item, i) => (
-                <div key={i} className="border rounded-lg p-3 space-y-2">
-                  <div className="font-semibold text-gray-900">{item.product_name}</div>
-                  <div className="grid grid-cols-3 gap-2 text-sm">
-                    <div>
-                      <span className="text-gray-500">Price:</span>
-                      <div className="font-medium">₹{item.price}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Qty:</span>
-                      <div className="font-medium">{item.qty}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Total:</span>
-                      <div className="font-bold text-green-700">₹{item.price * item.qty}</div>
-                    </div>
+            {/* Quick Status / Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <div>
+                <span className="text-xs font-semibold text-gray-500 block mb-1">Payment Status</span>
+                <select
+                  value={selectedOrder.status.toLowerCase()}
+                  onChange={(e) => handleStatusChange(selectedOrder._id, e.target.value)}
+                  className="w-full text-sm font-semibold rounded-md px-3 py-1.5 border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none bg-white"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="success">Success</option>
+                </select>
+              </div>
+              <div>
+                <span className="text-xs font-semibold text-gray-500 block mb-1">Order Status</span>
+                <select
+                  value={selectedOrder.orderStatus.toLowerCase()}
+                  onChange={(e) => handleOrderStatusChange(selectedOrder._id, e.target.value)}
+                  className="w-full text-sm font-semibold rounded-md px-3 py-1.5 border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none bg-white"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="out for delivery">Out for Delivery</option>
+                  <option value="delivered">Delivered</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Customer & Address Details */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Customer Info */}
+              <div className="border border-gray-100 rounded-lg p-4 bg-gray-50/50">
+                <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2 border-b pb-2">
+                  <User className="w-4 h-4 text-green-600" /> Customer Information
+                </h3>
+                <div className="space-y-2 text-sm text-gray-700">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Name:</span>
+                    <span className="font-semibold text-gray-900">{selectedOrder.userName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Phone:</span>
+                    <span className="font-medium text-gray-900">{selectedOrder.phone}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Email:</span>
+                    <span className="text-gray-900 font-medium break-all">{selectedOrder.email || "N/A"}</span>
                   </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Shipping Address */}
+              <div className="border border-gray-100 rounded-lg p-4 bg-gray-50/50">
+                <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2 border-b pb-2">
+                  <MapPin className="w-4 h-4 text-green-600" /> Shipping Address
+                </h3>
+                <div className="space-y-1 text-sm text-gray-700 font-normal">
+                  <p className="font-semibold text-gray-900">{selectedOrder.userName}</p>
+                  <p className="text-gray-600">{selectedOrder.address}</p>
+                  <p className="text-gray-600">
+                    {selectedOrder.city}, {selectedOrder.state} - <span className="font-mono">{selectedOrder.pincode}</span>
+                  </p>
+                </div>
+              </div>
             </div>
 
-            {/* Desktop View - Table Layout */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-sm border">
-                <thead className="bg-gray-100 text-left">
-                  <tr>
-                    <th className="p-2">Product</th>
-                    <th className="p-2">Price</th>
-                    <th className="p-2">Qty</th>
-                    <th className="p-2">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedOrder.items.map((item, i) => (
-                    <tr key={i} className="border-t">
-                      <td className="p-2">{item.product_name}</td>
-                      <td className="p-2">₹{item.price}</td>
-                      <td className="p-2">{item.qty}</td>
-                      <td className="p-2 font-semibold">₹{item.price * item.qty}</td>
+            {/* Items Ordered */}
+            <div className="mb-6">
+              <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2 border-b pb-2">
+                <FileText className="w-4 h-4 text-green-600" /> Items Ordered
+              </h3>
+              
+              {/* Desktop Table View */}
+              <div className="hidden md:block border border-gray-200 rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 text-left text-gray-600 font-medium border-b border-gray-200">
+                    <tr>
+                      <th className="p-3">Product Name</th>
+                      <th className="p-3 text-right">Price</th>
+                      <th className="p-3 text-center">Qty</th>
+                      <th className="p-3 text-right">Total</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-gray-700 bg-white">
+                    {selectedOrder.items.map((item, i) => (
+                      <tr key={i} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="p-3 font-medium text-gray-900">{item.product_name}</td>
+                        <td className="p-3 text-right">₹{item.price.toLocaleString("en-IN")}</td>
+                        <td className="p-3 text-center">{item.qty}</td>
+                        <td className="p-3 text-right font-semibold text-gray-900">₹{(item.price * item.qty).toLocaleString("en-IN")}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="block md:hidden space-y-3">
+                {selectedOrder.items.map((item, i) => (
+                  <div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2 bg-white">
+                    <div className="font-semibold text-gray-900">{item.product_name}</div>
+                    <div className="grid grid-cols-3 gap-2 text-xs text-gray-600">
+                      <div>
+                        <span className="text-gray-400 block">Price</span>
+                        <span className="font-medium text-gray-800">₹{item.price.toLocaleString("en-IN")}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 block">Qty</span>
+                        <span className="font-medium text-gray-800">{item.qty}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-gray-400 block">Total</span>
+                        <span className="font-bold text-green-700">₹{(item.price * item.qty).toLocaleString("en-IN")}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <button
-              onClick={closeModal}
-              className="mt-4 w-full md:w-auto px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
-            >
-              Close
-            </button>
+            {/* Payment Info & Cost Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 pt-4 border-t border-gray-100">
+              {/* Payment details */}
+              <div className="border border-gray-100 rounded-lg p-4 bg-gray-50/50">
+                <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2 border-b pb-2">
+                  <CreditCard className="w-4 h-4 text-green-600" /> Payment & Transaction Info
+                </h3>
+                <div className="space-y-2 text-sm text-gray-700">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Method:</span>
+                    <span className="font-semibold uppercase text-gray-900">{selectedOrder.paymentMethod}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Payment Status:</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                      selectedOrder.status.toLowerCase() === "success" 
+                        ? "bg-green-100 text-green-800" 
+                        : "bg-amber-100 text-amber-800"
+                    }`}>
+                      {selectedOrder.status}
+                    </span>
+                  </div>
+                  {selectedOrder.paymentMethod === "Online" && selectedOrder.paymentInfo && (
+                    <div className="pt-2 border-t border-gray-100 space-y-1.5 font-mono text-[11px] text-gray-500">
+                      <div>
+                        <span className="text-gray-400 block font-sans text-xs font-normal">Razorpay Order ID:</span>
+                        <span className="break-all select-all font-semibold text-gray-700">{selectedOrder.paymentInfo.razorpay_order_id || "N/A"}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 block font-sans text-xs font-normal">Razorpay Payment ID:</span>
+                        <span className="break-all select-all font-semibold text-gray-700">{selectedOrder.paymentInfo.razorpay_payment_id || "N/A"}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Cost summary */}
+              <div className="border border-gray-100 rounded-lg p-4 bg-gray-50/50">
+                <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2 border-b pb-2">
+                  Summary
+                </h3>
+                <div className="space-y-2 text-sm text-gray-700 font-normal">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Subtotal:</span>
+                    <span className="font-medium text-gray-900">₹{(selectedOrder.subtotal || 0).toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Shipping Charges:</span>
+                    <span className="font-medium text-gray-900">₹{(selectedOrder.shipping || 0).toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Tax:</span>
+                    <span className="font-medium text-gray-900">₹{(selectedOrder.tax || 0).toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-2 mt-2">
+                    <span className="text-base font-bold text-gray-800">Grand Total:</span>
+                    <span className="text-lg font-bold text-green-700">₹{(selectedOrder.total || 0).toLocaleString("en-IN")}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer with Actions */}
+            <div className="flex justify-end items-center pt-4 border-t border-gray-200">
+              <button
+                onClick={closeModal}
+                className="w-full sm:w-auto px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-md text-sm transition-colors border border-gray-300"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

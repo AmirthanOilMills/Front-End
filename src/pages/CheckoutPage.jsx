@@ -305,17 +305,7 @@ const CheckoutPage = () => {
             >
               Continue Shopping
             </button> */}
-            {/* Invoice */}
-            {invoiceUrl && (
-              <a
-                href={`${BASE_URL}/${invoiceUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-4 py-2 bg-green-600 text-white font-semibold rounded-md mt-4 hover:bg-green-700 transition"
-              >
-                Download Invoice
-              </a>
-            )}
+
             <button
               onClick={() => navigate('/products')}
               className="w-full border border-green-800 text-green-800 hover:bg-green-50 font-semibold py-3 rounded-lg"
