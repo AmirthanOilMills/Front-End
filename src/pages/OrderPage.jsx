@@ -15,16 +15,18 @@ const statusColors = {
 
 const OrderPage = () => {
   const storeOrderIds = useStore((state) => state.orders); // stored orderIds
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [orders, setOrders] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   // 👉 Initial load: fetch all orders using email + store IDs combined
   useEffect(() => {
+    if (authLoading) return;
+
     const payload = {};
 
     if (user?.email) {
@@ -36,10 +38,14 @@ const OrderPage = () => {
     }
 
     // Only fetch if we have at least one identifier
-    if (payload.email || payload.orderIds) {
+    if (payload.email || (payload.orderIds && payload.orderIds.length > 0)) {
       fetchOrders(payload);
+    } else {
+      setOrders([]);
+      setLoading(false);
+      setError("No orders found.");
     }
-  }, [storeOrderIds, user]);
+  }, [storeOrderIds, user, authLoading]);
 
   // ================= API CALL =================
   const fetchOrders = async (payload) => {
