@@ -59,12 +59,25 @@ const ProductDetailPage = () => {
 
   const isInWishlist = (id) => wishlist.some((item) => String(item.id || item._id) === String(id));
 
-  // Determine Images
-  const images = product.images && product.images.length > 0
-    ? product.images
-    : product.main_image
-    ? [product.main_image]
-    : [];
+  // Determine Images (combine main_image and gallery_images, fallback to images array)
+  const images = React.useMemo(() => {
+    if (!product) return [];
+    const list = [];
+    if (product.main_image?.url) {
+      list.push(product.main_image);
+    }
+    if (Array.isArray(product.gallery_images) && product.gallery_images.length > 0) {
+      product.gallery_images.forEach((img) => {
+        if (img?.url && !list.some((existing) => existing.url === img.url)) {
+          list.push(img);
+        }
+      });
+    }
+    if (list.length === 0 && Array.isArray(product.images) && product.images.length > 0) {
+      return product.images;
+    }
+    return list;
+  }, [product]);
 
   // Reset index if image list changes
   useEffect(() => {

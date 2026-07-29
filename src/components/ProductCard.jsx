@@ -22,8 +22,25 @@ const ProductCard = ({ product, onViewDetails }) => {
     (item) => String(item.id) === String(product._id || product.id)
   );
 
-  // Automatic slideshow when not hovered
-  const images = product?.images || [];
+  // Determine Images (combine main_image and gallery_images, fallback to images array)
+  const images = React.useMemo(() => {
+    if (!product) return [];
+    const list = [];
+    if (product.main_image?.url) {
+      list.push(product.main_image);
+    }
+    if (Array.isArray(product.gallery_images) && product.gallery_images.length > 0) {
+      product.gallery_images.forEach((img) => {
+        if (img?.url && !list.some((existing) => existing.url === img.url)) {
+          list.push(img);
+        }
+      });
+    }
+    if (list.length === 0 && Array.isArray(product.images) && product.images.length > 0) {
+      return product.images;
+    }
+    return list;
+  }, [product]);
 
   useEffect(() => {
     if (!isHovered && images.length > 1) {
