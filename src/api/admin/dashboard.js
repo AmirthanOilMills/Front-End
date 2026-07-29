@@ -1,6 +1,7 @@
-import { getRequest} from "../api"
+import { getRequest } from "../api";
 
-
-export function getDashboardStats(){
-    return getRequest(`/admin/dashboardstats`);
+export function getDashboardStats(month = "") {
+    let query = `/admin/dashboardstats`;
+    if (month) query += `?month=${month}`;
+    return getRequest(query);
 }

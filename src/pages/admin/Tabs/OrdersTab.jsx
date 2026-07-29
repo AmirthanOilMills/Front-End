@@ -17,6 +17,14 @@ const OrdersTab = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
+  // Payment confirmation modal state
+  const [confirmPaymentModal, setConfirmPaymentModal] = useState({
+    open: false,
+    orderId: null,
+    orderCode: "",
+    newStatus: "",
+  });
+
   useEffect(() => {
     fetchOrders();
   }, [page, search, filterMethod, filterStatus]);
@@ -45,6 +53,29 @@ const OrdersTab = () => {
       console.error("Failed to update order status:", err);
       alert("Failed to update status.");
     }
+  };
+
+  const handlePaymentStatusSelect = (orderId, orderCode, currentStatus, newStatus) => {
+    if (currentStatus.toLowerCase() === "success") {
+      return; // Already success, disabled
+    }
+    if (newStatus.toLowerCase() === "success") {
+      setConfirmPaymentModal({
+        open: true,
+        orderId,
+        orderCode,
+        newStatus,
+      });
+    } else {
+      handleStatusChange(orderId, newStatus);
+    }
+  };
+
+  const confirmPaymentStatusChange = async () => {
+    if (confirmPaymentModal.orderId && confirmPaymentModal.newStatus) {
+      await handleStatusChange(confirmPaymentModal.orderId, confirmPaymentModal.newStatus);
+    }
+    setConfirmPaymentModal({ open: false, orderId: null, orderCode: "", newStatus: "" });
   };
 
   const handleOrderStatusChange = async (id, newOrderStatus) => {
@@ -161,8 +192,9 @@ const OrdersTab = () => {
                   <label className="text-xs text-gray-500 block mb-1">Payment Status</label>
                   <select
                     value={order.status.toLowerCase()}
-                    onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                    className="w-full text-sm font-semibold rounded-md px-3 py-2 border focus:ring-2 focus:ring-green-500 focus:outline-none"
+                    disabled={order.status.toLowerCase() === "success"}
+                    onChange={(e) => handlePaymentStatusSelect(order._id, order.orderId, order.status, e.target.value)}
+                    className="w-full text-sm font-semibold rounded-md px-3 py-2 border focus:ring-2 focus:ring-green-500 focus:outline-none disabled:bg-green-50 disabled:text-green-800 disabled:cursor-not-allowed disabled:border-green-300"
                   >
                     <option value="pending">Pending</option>
                     <option value="success">Success</option>
@@ -247,8 +279,9 @@ const OrdersTab = () => {
                     <td className="xl:px-4 xl:py-4 p-0">
                       <select
                         value={order.status.toLowerCase()}
-                        onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                        className="text-xs font-semibold rounded-full px-2 py-1 border focus:ring-2 focus:ring-green-500 focus:outline-none"
+                        disabled={order.status.toLowerCase() === "success"}
+                        onChange={(e) => handlePaymentStatusSelect(order._id, order.orderId, order.status, e.target.value)}
+                        className="text-xs font-semibold rounded-full px-2 py-1 border focus:ring-2 focus:ring-green-500 focus:outline-none disabled:bg-green-100 disabled:text-green-800 disabled:cursor-not-allowed disabled:border-green-300"
                       >
                         <option value="pending">Pending</option>
                         <option value="success">Success</option>
@@ -422,8 +455,9 @@ const OrdersTab = () => {
                 <span className="text-xs font-semibold text-gray-500 block mb-1">Payment Status</span>
                 <select
                   value={selectedOrder.status.toLowerCase()}
-                  onChange={(e) => handleStatusChange(selectedOrder._id, e.target.value)}
-                  className="w-full text-sm font-semibold rounded-md px-3 py-1.5 border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none bg-white"
+                  disabled={selectedOrder.status.toLowerCase() === "success"}
+                  onChange={(e) => handlePaymentStatusSelect(selectedOrder._id, selectedOrder.orderId, selectedOrder.status, e.target.value)}
+                  className="w-full text-sm font-semibold rounded-md px-3 py-1.5 border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none bg-white disabled:bg-green-50 disabled:text-green-800 disabled:cursor-not-allowed disabled:border-green-300"
                 >
                   <option value="pending">Pending</option>
                   <option value="success">Success</option>
@@ -591,6 +625,12 @@ const OrdersTab = () => {
                     <span className="text-gray-500">Tax:</span>
                     <span className="font-medium text-gray-900">₹{(selectedOrder.tax || 0).toLocaleString("en-IN")}</span>
                   </div>
+                  {selectedOrder.couponCode && (
+                    <div className="flex justify-between text-green-700">
+                      <span>Coupon Discount ({selectedOrder.couponCode}):</span>
+                      <span className="font-medium">-₹{(selectedOrder.couponDiscount || 0).toLocaleString("en-IN")}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between border-t pt-2 mt-2">
                     <span className="text-base font-bold text-gray-800">Grand Total:</span>
                     <span className="text-lg font-bold text-green-700">₹{(selectedOrder.total || 0).toLocaleString("en-IN")}</span>
@@ -606,6 +646,38 @@ const OrdersTab = () => {
                 className="w-full sm:w-auto px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-md text-sm transition-colors border border-gray-300"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal for Marking Payment as Success */}
+      {confirmPaymentModal.open && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-[60] p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl space-y-4 animate-fadeIn">
+            <h3 className="text-lg font-bold text-gray-900">Confirm Payment Received</h3>
+            <p className="text-gray-600 text-sm">
+              Are you sure the payment has been completed for Order{" "}
+              <span className="font-mono font-semibold text-gray-900">#{confirmPaymentModal.orderCode}</span>?
+            </p>
+            <p className="text-xs text-amber-800 bg-amber-50 p-3 rounded-md border border-amber-200">
+              ⚠️ Once marked as <strong>Success</strong>, payment status will be locked and a payment record will be automatically created in the payments table.
+            </p>
+            <div className="flex justify-end space-x-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setConfirmPaymentModal({ open: false, orderId: null, orderCode: "", newStatus: "" })}
+                className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmPaymentStatusChange}
+                className="px-4 py-2 text-sm text-white bg-green-700 hover:bg-green-800 rounded-md font-semibold transition-colors"
+              >
+                Yes, Payment Received
               </button>
             </div>
           </div>

@@ -11,6 +11,7 @@ import {
   CreditCard,
   MessageSquare,
   LogOut,
+  Percent,
 } from "lucide-react";
 
 import { useAuth } from "../../contexts/AuthContext";
@@ -24,6 +25,8 @@ import CategoriesTab from "./Tabs/CategoriesTab";
 import PaymentTab from "./Tabs/PaymentTab";
 import ContactFormTab from "./Tabs/ContactFormTab";
 import CustomersTab from "./Tabs/CustomersTab";
+import CouponsTab from "./Tabs/CouponsTab";
+import CouponUsagePage from "./Tabs/CouponUsagePage";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -40,6 +43,7 @@ const AdminDashboard = () => {
     { name: "Overview", path: "", icon: LayoutDashboard },
     { name: "Categories", path: "categories", icon: Layers },
     { name: "Products", path: "products", icon: Package },
+    { name: "Coupons", path: "coupons", icon: Percent },
     { name: "Orders", path: "orders", icon: ShoppingCart },
     { name: "Payments", path: "payments", icon: CreditCard },
     { name: "Contact", path: "contact", icon: MessageSquare },
@@ -131,6 +135,8 @@ const AdminDashboard = () => {
             <Route index element={<OverviewTab />} />
             <Route path="categories" element={<CategoriesTab />} />
             <Route path="products" element={<ProductsTab />} />
+            <Route path="coupons" element={<CouponsTab />} />
+            <Route path="coupons/:code" element={<CouponUsagePage />} />
             <Route path="orders" element={<OrdersTab />} />
             <Route path="payments" element={<PaymentTab />} />
             <Route path="contact" element={<ContactFormTab />} />

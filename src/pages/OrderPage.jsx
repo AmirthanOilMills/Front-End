@@ -23,12 +23,21 @@ const OrderPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 👉 Initial load: fetch all orders using email (if logged in) or store IDs (if guest)
+  // 👉 Initial load: fetch all orders using email + store IDs combined
   useEffect(() => {
+    const payload = {};
+
     if (user?.email) {
-      fetchOrders({ email: user.email });
-    } else if (storeOrderIds?.length > 0) {
-      fetchOrders({ orderIds: storeOrderIds });
+      payload.email = user.email.trim().toLowerCase();
+    }
+
+    if (storeOrderIds?.length > 0) {
+      payload.orderIds = storeOrderIds;
+    }
+
+    // Only fetch if we have at least one identifier
+    if (payload.email || payload.orderIds) {
+      fetchOrders(payload);
     }
   }, [storeOrderIds, user]);
 
@@ -54,18 +63,22 @@ const OrderPage = () => {
 
   // ================= SEARCH HANDLER =================
   const handleSearch = () => {
-    // 🔹 If search empty → fetch all orders from store or email
-    if (!search.trim()) {
-      if (user?.email) {
-        fetchOrders({ email: user.email });
-      } else {
-        fetchOrders({ orderIds: storeOrderIds });
-      }
+    const queryTerm = search.trim();
+    // 🔹 If search empty → fetch all orders from store + email
+    if (!queryTerm) {
+      const payload = {};
+      if (user?.email) payload.email = user.email.trim().toLowerCase();
+      if (storeOrderIds?.length > 0) payload.orderIds = storeOrderIds;
+      if (payload.email || payload.orderIds) fetchOrders(payload);
       return;
     }
 
-    // 🔹 If search has value → send only that ID
-    fetchOrders({ orderIds: [search.trim().toLowerCase()] });
+    // 🔹 If search contains '@' -> search by email, else search by order ID
+    if (queryTerm.includes("@")) {
+      fetchOrders({ email: queryTerm.toLowerCase() });
+    } else {
+      fetchOrders({ orderIds: [queryTerm.toLowerCase()] });
+    }
   };
 
   const toggleExpand = (orderId) => {

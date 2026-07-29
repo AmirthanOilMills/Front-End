@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle, Tag, X } from 'lucide-react';
 import useStore from '../helpers/useStore';
 import { useNavigate } from 'react-router-dom';
 import { createCODOrder, createRazorpayOrder, verifyPayment } from '../api/public/Order';
+import { validateCoupon } from '../api/public/coupon';
+import { useAuth } from '../contexts/AuthContext';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   // Zustand store
   const cart = useStore((state) => state.cart);
   const clearCart = useStore((state) => state.clearCart);
@@ -17,9 +20,9 @@ const CheckoutPage = () => {
 
   // State
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
     address: '',
     city: '',
     state: '',
@@ -27,24 +30,81 @@ const CheckoutPage = () => {
     paymentMethod: 'cod',
   });
 
+  // Auto-fill user details if user loads after initial render
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: prev.name || user.name || '',
+        email: prev.email || user.email || '',
+        phone: prev.phone || user.phone || '',
+      }));
+    }
+  }, [user]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+
+  // Coupon State
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null); // { code, percentage }
+  const [couponError, setCouponError] = useState('');
+  const [couponSuccess, setCouponSuccess] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
 
   // Price calculation
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   const shippingCost = subtotal >= 500 ? 0 : 50;
-  // const finalTotal = subtotal + shippingCost;
+
+  // Coupon discount calculation
+  const couponDiscount = appliedCoupon
+    ? Math.round(subtotal * (appliedCoupon.percentage / 100))
+    : 0;
 
   const RAZORPAY_FEE_PERCENT = 2;
 
-  // Razorpay fee only for online payment
+  // Razorpay fee only for online payment (calculated on subtotal + shipping - discount)
   const Tax =
     formData.paymentMethod === "online"
-      ? (subtotal + shippingCost) * (RAZORPAY_FEE_PERCENT / 100)
+      ? Math.max(0, subtotal + shippingCost - couponDiscount) * (RAZORPAY_FEE_PERCENT / 100)
       : 0;
 
-  const finalTotalWithTax = subtotal + shippingCost + Tax;
-  const finalTotal = Math.round(finalTotalWithTax);
+  const finalTotalWithTax = subtotal + shippingCost + Tax - couponDiscount;
+  const finalTotal = Math.max(0, Math.round(finalTotalWithTax));
+
+  // Coupon Handlers
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) {
+      setCouponError("Please enter a coupon code");
+      return;
+    }
+    setCouponLoading(true);
+    setCouponError("");
+    setCouponSuccess("");
+    try {
+      const res = await validateCoupon(couponInput.trim());
+      if (res.success && res.coupon) {
+        setAppliedCoupon({
+          code: res.coupon.coupon_name,
+          percentage: res.coupon.percentage,
+        });
+        setCouponSuccess(`Coupon "${res.coupon.coupon_name}" applied (${res.coupon.percentage}% OFF)`);
+        setCouponInput("");
+      } else {
+        setCouponError(res.message || "Invalid coupon code");
+      }
+    } catch (err) {
+      setCouponError(err.response?.data?.message || "Failed to validate coupon");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponSuccess("");
+    setCouponError("");
+  };
 
   // Input change
   const handleInputChange = (e) => {
@@ -143,14 +203,16 @@ const CheckoutPage = () => {
 
     setIsSubmitting(true);
 
+    const orderEmail = (formData.email || user?.email || "").trim().toLowerCase();
+
     // -----------------------------
     // (A) Cash on Delivery
     // -----------------------------
     if (formData.paymentMethod === "cod") {
       const orderData = {
-        userName: formData.name,
-        phone: formData.phone,
-        email: formData.email,
+        userName: formData.name || user?.name || "",
+        phone: formData.phone || user?.phone || "",
+        email: orderEmail,
         address: formData.address,
         city: formData.city,
         state: formData.state,
@@ -159,6 +221,8 @@ const CheckoutPage = () => {
         subtotal,
         shipping: shippingCost,
         tax: Tax || 0,
+        couponCode: appliedCoupon?.code || "",
+        couponDiscount,
         total: finalTotal,
         paymentMethod: "COD",
       };
@@ -211,9 +275,9 @@ const CheckoutPage = () => {
           try {
             // Verify payment on backend
             const verifyRes = await verifyPayment({
-              userName: formData.name,
-              phone: formData.phone,
-              email: formData.email,
+              userName: formData.name || user?.name || "",
+              phone: formData.phone || user?.phone || "",
+              email: orderEmail,
               address: formData.address,
               city: formData.city,
               state: formData.state,
@@ -222,6 +286,8 @@ const CheckoutPage = () => {
               subtotal,
               shipping: shippingCost,
               tax: Tax || 0,
+              couponCode: appliedCoupon?.code || "",
+              couponDiscount,
               total: finalTotal,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
@@ -299,13 +365,6 @@ const CheckoutPage = () => {
           </p>
 
           <div className="space-y-3">
-            {/* <button
-              onClick={() => navigate('/')}
-              className="w-full bg-green-800 hover:bg-green-900 text-white font-semibold py-3 rounded-lg"
-            >
-              Continue Shopping
-            </button> */}
-
             <button
               onClick={() => navigate('/products')}
               className="w-full border border-green-800 text-green-800 hover:bg-green-50 font-semibold py-3 rounded-lg"
@@ -476,9 +535,63 @@ const CheckoutPage = () => {
               ))}
             </div>
 
+            {/* Coupon Section */}
+            <div className="border-t pt-4 mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
+                <Tag className="w-4 h-4 text-green-700" /> Have a Coupon?
+              </label>
+
+              {appliedCoupon ? (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Tag className="w-4 h-4 text-green-600" />
+                    <div>
+                      <p className="text-sm font-bold text-green-800 uppercase">{appliedCoupon.code}</p>
+                      <p className="text-xs text-green-600">{appliedCoupon.percentage}% Discount Applied</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition"
+                    title="Remove coupon"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponInput}
+                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                    placeholder="Enter Coupon Code"
+                    className="flex-1 px-3 py-2 border rounded-md uppercase text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading}
+                    className="px-4 py-2 bg-green-700 hover:bg-green-800 disabled:bg-gray-400 text-white rounded-md text-sm font-semibold transition"
+                  >
+                    {couponLoading ? "Applying..." : "Apply"}
+                  </button>
+                </div>
+              )}
+
+              {couponError && <p className="text-red-500 text-xs mt-1.5">{couponError}</p>}
+              {couponSuccess && <p className="text-green-600 text-xs mt-1.5">{couponSuccess}</p>}
+            </div>
+
             <div className="space-y-3 border-t pt-4">
               <div className="flex justify-between"><span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
               <div className="flex justify-between"><span>Shipping</span><span>{shippingCost === 0 ? "Free" : `₹${shippingCost}`}</span></div>
+              {appliedCoupon && (
+                <div className="flex justify-between text-green-700">
+                  <span>Coupon Discount ({appliedCoupon.percentage}%)</span>
+                  <span>-₹{couponDiscount.toFixed(2)}</span>
+                </div>
+              )}
               {formData.paymentMethod == "online" && (
                 <div className="flex justify-between">
                   <span>Online Payment Fee (2%)</span>
@@ -486,14 +599,12 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-
               <div className="flex justify-between text-lg font-bold border-t pt-3">
                 <span>Total</span>
                 <span className="text-green-800">₹{finalTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
